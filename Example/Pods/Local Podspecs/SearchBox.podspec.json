@@ -1,8 +1,8 @@
 {
   "name": "SearchBox",
   "version": "0.1.0",
-  "summary": "A short description of SearchBox.",
-  "description": "TODO: Add long description of the pod here.",
+  "summary": "A subclass of NSSearchField that provides a completions drop-down menu",
+  "description": "Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.",
   "homepage": "https://github.com/dougzilla32/SearchBox",
   "license": {
     "type": "MIT",
@@ -18,5 +18,6 @@
   "platforms": {
     "osx": "10.10"
   },
-  "source_files": "SearchBox/Classes/**/*"
+  "source_files": "SearchBox/Classes/**/*",
+  "swift_version": "4.1"
 }

@@ -1,16 +1,41 @@
 PODS:
+  - Alamofire (4.7.2)
+  - PromiseKit (6.2.5):
+    - PromiseKit/CorePromise (= 6.2.5)
+    - PromiseKit/Foundation (= 6.2.5)
+    - PromiseKit/UIKit (= 6.2.5)
+  - PromiseKit/Alamofire (6.2.5):
+    - Alamofire (~> 4.0)
+    - PromiseKit/CorePromise
+  - PromiseKit/CorePromise (6.2.5)
+  - PromiseKit/Foundation (6.2.5):
+    - PromiseKit/CorePromise
   - SearchBox (0.1.0)
+  - SwiftyBeaver (1.5.2)
 
 DEPENDENCIES:
+  - Alamofire (~> 4.6)
+  - PromiseKit (~> 6.0)
+  - PromiseKit/Alamofire (~> 6.0)
   - SearchBox (from `../`)
+  - SwiftyBeaver (~> 1.5)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Alamofire
+    - PromiseKit
+    - SwiftyBeaver
 
 EXTERNAL SOURCES:
   SearchBox:
     :path: "../"
 
 SPEC CHECKSUMS:
-  SearchBox: d60909b00ef5fc7a839b9e0f0ca7650e347df649
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  PromiseKit: a26828b0a8d5874960dfdb575b57a70790ec36f1
+  SearchBox: dc2a4da79b24943a42c6181ab9bfb696ac21c74a
+  SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
 
-PODFILE CHECKSUM: 3a040bb6da3964eaf47d459d0ec1e86753d87e03
+PODFILE CHECKSUM: ba730f61fb1a70e199d1de9d4a98e2b962abbb5d
 
 COCOAPODS: 1.5.0
