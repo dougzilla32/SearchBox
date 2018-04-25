@@ -1,0 +1,22 @@
+{
+  "name": "SearchBox",
+  "version": "0.1.0",
+  "summary": "A short description of SearchBox.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/dougzilla32/SearchBox",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "dougzilla32": "dougzilla32@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/dougzilla32/SearchBox.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "osx": "10.10"
+  },
+  "source_files": "SearchBox/Classes/**/*"
+}

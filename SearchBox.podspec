@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'SearchBox'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of SearchBox.'
+  s.summary          = 'A subclass on NSSearchField that provides a completions drop-down menu'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
                        DESC
 
   s.homepage         = 'https://github.com/dougzilla32/SearchBox'

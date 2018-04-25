@@ -1,0 +1,16 @@
+PODS:
+  - SearchBox (0.1.0)
+
+DEPENDENCIES:
+  - SearchBox (from `../`)
+
+EXTERNAL SOURCES:
+  SearchBox:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  SearchBox: d60909b00ef5fc7a839b9e0f0ca7650e347df649
+
+PODFILE CHECKSUM: 3a040bb6da3964eaf47d459d0ec1e86753d87e03
+
+COCOAPODS: 1.5.0
