@@ -10,7 +10,11 @@ PODS:
   - PromiseKit/CorePromise (6.2.5)
   - PromiseKit/Foundation (6.2.5):
     - PromiseKit/CorePromise
-  - SearchBox (0.1.0)
+  - SearchBox (0.1.0):
+    - Alamofire (~> 4.6)
+    - PromiseKit (~> 6.0)
+    - PromiseKit/Alamofire (~> 6.0)
+    - SwiftyBeaver (~> 1.5)
   - SwiftyBeaver (1.5.2)
 
 DEPENDENCIES:
@@ -33,7 +37,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   PromiseKit: a26828b0a8d5874960dfdb575b57a70790ec36f1
-  SearchBox: dc2a4da79b24943a42c6181ab9bfb696ac21c74a
+  SearchBox: 1a9eba0be8965da1a4c667c2868c038c78bb5ba0
   SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
 
 PODFILE CHECKSUM: ba730f61fb1a70e199d1de9d4a98e2b962abbb5d

@@ -41,5 +41,9 @@ Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'Cocoa'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  
+  s.dependency 'Alamofire', '~> 4.6'
+  s.dependency 'PromiseKit', '~> 6.0'
+  s.dependency 'PromiseKit/Alamofire', '~> 6.0'
+  s.dependency 'SwiftyBeaver', '~> 1.5'
 end

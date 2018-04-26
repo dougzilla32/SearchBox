@@ -7,16 +7,14 @@
 //
 
 import Cocoa
-import SearchBox_Example
+import SearchBox
 
 class ViewController: NSViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    var s: Search
     
-    
-    var s: SearchBox?
-
     // Do any additional setup after loading the view.
   }
 
