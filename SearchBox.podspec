@@ -35,9 +35,9 @@ Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
 
   s.swift_version = "4.1"
   
-  # s.resource_bundles = {
-  #   'SearchBox' => ['SearchBox/Assets/*.png']
-  # }
+  s.resource_bundles = {
+    'SearchBox' => ['SearchBox/**/*.xib']
+  }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'Cocoa'
