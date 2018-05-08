@@ -1,6 +1,0 @@
-framework module SearchBox {
-  umbrella header "SearchBox-umbrella.h"
-
-  export *
-  module * { export * }
-}
