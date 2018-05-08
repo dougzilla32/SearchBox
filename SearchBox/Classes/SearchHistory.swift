@@ -16,12 +16,12 @@ class SearchHistory: Sequence {
     var limit: Int
     
     init(limit: Int) {
-        first = SearchHistoryItem(name: "", country: "")
+        first = SearchHistoryItem(name: "", detail: "")
         last = first
         self.limit = Swift.max(limit, 2)
     }
     
-    func add(name: String, country: String) {
+    func add(name: String, detail: String) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
             if item.name == last.name {
@@ -30,7 +30,7 @@ class SearchHistory: Sequence {
             item.remove()
             item.timestamp = Date()
         } else {
-            item = SearchHistoryItem(name: name, country: country)
+            item = SearchHistoryItem(name: name, detail: detail)
             count += 1
             map[name] = item
             if count > limit {
@@ -69,12 +69,12 @@ class SearchHistoryItem {
     var prev: SearchHistoryItem?
     var next: SearchHistoryItem?
     var name: String
-    var country: String
+    var detail: String
     var timestamp: Date
     
-    init(name: String, country: String) {
+    init(name: String, detail: String) {
         self.name = name
-        self.country = country
+        self.detail = detail
         timestamp = Date()
     }
     

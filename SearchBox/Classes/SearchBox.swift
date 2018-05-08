@@ -9,9 +9,10 @@
 import Alamofire
 import Cocoa
 import PromiseKit
+import CancelForPromiseKit
 import SwiftyBeaver
 
-class SearchBox: NSSearchField, NSSearchFieldDelegate {
+public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // Delegate for this search box
     public var searchBoxDelegate: SearchBoxDelegate?
     
@@ -24,11 +25,32 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // Indicates if we should hide the cancel button when the field does not have the focus
     public var hideCancelButton = false
 
+    // If set to a number greater than zero, the SearchBox keeps track of this many items
+    // it it's search history
+    public var searchHistoryCount: Int {
+        get {
+            return searchHistory?.count ?? 0
+        }
+        
+        set {
+            if newValue != 0 {
+                searchHistory = SearchHistory(limit: newValue)
+            } else {
+                searchHistory = nil
+            }
+        }
+    }
+    
+    private var searchHistory: SearchHistory?
+    
     // If set to true, select all the text when we get a mouseDown event
     private var wantsSelectAll = false
     
     // Used to hide the cancel button when the search field does not have the focus.
     private var cancelButtonCell: NSButtonCell?
+    
+    // The most recently selected detail from the suggestions window
+    public internal(set) var detailValue = ""
     
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -42,9 +64,11 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     private func setup() {
         self.delegate = self
+        self.sendsSearchStringImmediately = true
+        self.sendsWholeSearchString = true
     }
     
-    override func becomeFirstResponder() -> Bool {
+    override public func becomeFirstResponder() -> Bool {
         if refuseFocus {
             return false
         }
@@ -53,7 +77,7 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
         return super.becomeFirstResponder()
     }
     
-    override func mouseDown(with event: NSEvent) {
+    override public func mouseDown(with event: NSEvent) {
         if #available(OSX 10.11, *) {
             let location = convert(event.locationInWindow, from: nil)
             let rect = rectForCancelButton(whenCentered: false)
@@ -84,7 +108,7 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
 
-    override func resignFirstResponder() -> Bool {
+    override public func resignFirstResponder() -> Bool {
         let status = super.resignFirstResponder()
         // The NSText editor took the focus from this NSSearchField, so effectively we have the focus
         if currentEditor() != nil {
@@ -104,22 +128,14 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     // MARK: Suggestions and Search History
     
-    private var suggestionsController: SuggestionsWindowController = {
-        // Create the suggestions controller
-        let suggestionsController = SuggestionsWindowController()
-        suggestionsController.target = self
-        suggestionsController.action = #selector(SearchBox.update(withSelectedSuggestion:))
-        return suggestionsController
-    }()
-    
+    private var suggestionsController: SuggestionsWindowController?
+
     private var skipNextSuggestion = false
-    private var searchHistory = SearchHistory(limit: 10)
 
     /* This is the action method for when the user changes the suggestion selection. Note, this action is called continuously as the suggestion selection changes while being tracked and does not denote user committal of the suggestion. For suggestion committal, the text field's action method is used (see above). This method is wired up programatically in the -controlTextDidBeginEditing: method below.
      */
-    @IBAction func update(withSelectedSuggestion sender: Any) {
+    @IBAction public func update(withSelectedSuggestion sender: Any?) {
         let entry = (sender as? SuggestionsWindowController)?.selectedSuggestion()
-        SwiftyBeaver.verbose("update \(String(describing: entry))")
         if entry != nil && !entry!.isEmpty {
             let fieldEditor: NSText? = self.window?.fieldEditor(false, for: self)
             if fieldEditor != nil {
@@ -128,34 +144,12 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    var currentWorkItem: DispatchWorkItem?
-    var currentRequest: Request?
+    var cancelContext = CancelContext()
     private var mostRecentCity: String?
 
     func cancelAllRequests() {
-        if let workItem = currentWorkItem {
-            currentWorkItem = nil
-            workItem.cancel()
-        }
-        if let request = currentRequest {
-            currentRequest = nil
-            request.cancel()
-        }
-    }
-    
-    func after(seconds: TimeInterval) -> Guarantee<Void> {
-        let (rg, seal) = Guarantee<Void>.pending()
-        let when = DispatchTime.now() + seconds
-        let task = DispatchWorkItem { seal(()) }
-        currentWorkItem = task
-        DispatchQueue.global(qos: .default).asyncAfter(deadline: when, execute: task)
-        return rg
-    }
-    
-    func completions(for text: String, delegate searchDelegate: SearchBoxDelegate) -> Promise<[(String,String)]> {
-        let completions = searchDelegate.completions(for: text)
-        self.currentRequest = completions.0
-        return completions.1
+        cancelContext.cancel()
+        cancelContext.reset()
     }
     
     func suggestions(forText text: String) -> Promise<[[String: Any]]> {
@@ -164,70 +158,74 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
         let searchDelegate: SearchBoxDelegate! = self.searchBoxDelegate
         if text == "" || searchDelegate == nil {
             var suggestions = [[String: Any]]()
-            for item in searchHistory {
-                suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.country])
+            if searchHistory != nil {
+                for item in searchHistory! {
+                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
+                }
             }
-            return Promise.value(suggestions)
+            return Promise.value(suggestions, cancel: cancelContext)
         }
         
-        return self.after(seconds: 0.2).then { _ in
-            return self.completions(for: self.stringValue, delegate: searchDelegate)
-        }.then { cities -> Promise<[[String: Any]]> in
-            self.currentRequest = nil
-            
+        return after(seconds: 0.2, cancel: cancelContext).then {
+            searchDelegate.completions(for: self.stringValue, context: self.cancelContext)
+        }.map { cities -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
-            for item in self.searchHistory where item.name.starts(with: self.stringValue) {
-                suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.country])
-                alreadyUsed.insert("\(item.name)|\(item.country)")
+            if self.searchHistory != nil {
+                for item in self.searchHistory! where item.name.starts(with: self.stringValue) {
+                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
+                    alreadyUsed.insert("\(item.name)|\(item.detail)")
+                }
             }
             for city in cities {
                 if !alreadyUsed.contains("\(city.0)|\(city.1)") {
                     suggestions.append([kSuggestionLabel: city.0, kSuggestionDetailedLabel: city.1])
                 }
             }
-            return Promise.value(suggestions)
+            return suggestions
         }
     }
     
     /* Determines the current list of suggestions, display the suggestions and update the field editor.
      */
     func updateSuggestions(from control: NSControl?) {
-        SwiftyBeaver.verbose("updateSuggestions")
-        let fieldEditor: NSText? = self.window?.fieldEditor(false, for: control)
-        if fieldEditor != nil {
+        guard let fieldEditor = self.window?.fieldEditor(false, for: control) else {
+            return
+        }
+        
+        let text: String?
+        if fillInCompletions {
             // Only use the text up to the caret position
-            let selection: NSRange? = fieldEditor?.selectedRange
-            let text = (selection != nil) ? (fieldEditor?.string as NSString?)?.substring(to: selection!.location) : nil
-            SwiftyBeaver.verbose("fetch suggestions IN \"\(String(describing: text))\"")
-            
-            firstly {
-                self.suggestions(forText: text ?? "")
-            }.done { suggestions in
-                SwiftyBeaver.verbose("fetch suggestions OUT \"\(suggestions.count)\"")
-                if suggestions.count > 0 {
-                    // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
-                    let suggestion = suggestions[0]
-                    self.updateFieldEditor(fieldEditor, withSuggestion: suggestion[kSuggestionLabel] as? String)
-                    self.suggestionsController.setSuggestions(suggestions)
-                    if !(self.suggestionsController.window?.isVisible ?? false) {
-                        self.suggestionsController.begin(for: (control as? NSTextField))
-                    }
-                } else {
-                    // No suggestions. Cancel the suggestion window.
-                    self.cancelSuggestions()
+            let selection: NSRange? = fieldEditor.selectedRange
+            text = (selection != nil) ? (fieldEditor.string as NSString?)?.substring(to: selection!.location) : nil
+        } else {
+            text = fieldEditor.string
+        }
+        
+        firstly {
+            self.suggestions(forText: text ?? "")
+        }.done { suggestions in
+            if suggestions.count > 0 {
+                // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
+                let suggestion = suggestions[0]
+                self.updateFieldEditor(fieldEditor, withSuggestion: suggestion[kSuggestionLabel] as? String)
+                self.suggestionsController?.setSuggestions(suggestions)
+                if !(self.suggestionsController?.window?.isVisible ?? false) {
+                    self.suggestionsController?.begin(for: (control as? SearchBox))
                 }
-            }.catch { error in
-                // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
-                SwiftyBeaver.error(error)
+            } else {
+                // No suggestions. Cancel the suggestion window.
+                self.cancelSuggestions()
             }
+        }.catch(policy: .allErrorsExceptCancellation) { error in
+            // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
+            SwiftyBeaver.error(error)
         }
     }
     
     /* Update the field editor with a suggested string. The additional suggested characters are auto selected.
      */
     private func updateFieldEditor(_ fieldEditor: NSText?, withSuggestion suggestion: String?) {
-        SwiftyBeaver.verbose("updateFieldEditor")
         /*
          NOTE: Do not update the text field with the suggestion text, because modern
          searches do not do this.
@@ -239,31 +237,30 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     func cancelSuggestions() {
-        SwiftyBeaver.verbose("cancelSuggestions")
         cancelAllRequests()
         
         /* If the suggestionController is already in a cancelled state, this call does nothing and is therefore always safe to call.
          */
-        suggestionsController.cancelSuggestions()
+        suggestionsController?.cancelSuggestions()
     }
     
     private func cancelEditing() {
-        SwiftyBeaver.verbose("cancelEditing")
         cancelSuggestions()
         currentEditor()?.selectedRange = NSRange(location: 0, length: 0)
         self.window?.makeFirstResponder(nil)
     }
     
     private func endEditing() {
-        SwiftyBeaver.verbose("endEditing")
         cancelEditing()
         mostRecentCity = self.stringValue
-        searchBoxDelegate?.search(for: self.stringValue)
+
+        searchHistory?.add(name: self.stringValue, detail: detailValue)
+        sendAction(action, to: target)
     }
     
     // MARK: NSTextFieldDelegate
     
-    override func textDidEndEditing(_ notification: Notification) {
+    override public func textDidEndEditing(_ notification: Notification) {
         super.textDidEndEditing(notification)
         if hideCancelButton {
             if currentEditor() == nil {
@@ -277,24 +274,26 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     /* In interface builder, we set this class object as the delegate for the search text field. When the user starts editing the text field, this method is called. This is an opportune time to display the initial suggestions.
      */
-    override func controlTextDidBeginEditing(_ notification: Notification?) {
-        SwiftyBeaver.verbose("controlTextDidBeginEditing")
-        
+    override public func controlTextDidBeginEditing(_ notification: Notification?) {
         if !skipNextSuggestion {
+            if suggestionsController == nil {
+                suggestionsController = SuggestionsWindowController()
+                suggestionsController?.target = self
+                suggestionsController?.action = #selector(SearchBox.update(withSelectedSuggestion:))
+            }
             updateSuggestions(from: notification?.object as? NSControl)
         }
     }
     
     /* The field editor's text may have changed for a number of reasons. Generally, we should update the suggestions window with the new suggestions. However, in some cases (the user deletes characters) we cancel the suggestions window.
      */
-    override func controlTextDidChange(_ notification: Notification?) {
-        SwiftyBeaver.verbose("controlTextDidChange")
+    override public func controlTextDidChange(_ notification: Notification?) {
         if !skipNextSuggestion {
             updateSuggestions(from: notification?.object as? NSControl)
         } else {
             // If we are skipping this suggestion, then cancel the suggestions window.
             // If the suggestionController is already in a cancelled state, this call does nothing and is therefore always safe to call.
-            suggestionsController.cancelSuggestions()
+            suggestionsController?.cancelSuggestions()
             // This suggestion has been skipped, don't skip the next one.
             skipNextSuggestion = false
         }
@@ -303,14 +302,13 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
     /* The field editor has ended editing the text. This is not the same as the action from the NSTextField. In the MainMenu.xib, the search text field is setup to only send its action on return / enter. If the user tabs to or clicks on another control, text editing will end and this method is called. We don't consider this committal of the action. Instead, we realy on the text field's action to commit
      the suggestion. However, since the action may not occur, we need to cancel the suggestions window here.
      */
-    override func controlTextDidEndEditing(_ obj: Notification?) {
-        SwiftyBeaver.verbose("controlTextDidEndEditing")
-        suggestionsController.cancelSuggestions()
+    override public func controlTextDidEndEditing(_ obj: Notification?) {
+        suggestionsController?.cancelSuggestions()
     }
     
     /* As the delegate for the NSTextField, this class is given a chance to respond to the key binding commands interpreted by the input manager when the field editor calls -interpretKeyEvents:. This is where we forward some of the keyboard commands to the suggestion window to facilitate keyboard navigation. Also, this is where we can determine when the user deletes and where we can prevent AppKit's auto completion.
      */
-    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+    public func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if commandSelector == #selector(NSResponder.cancelOperation(_:)) {
             // Revert to previous city when escape key is pressed
             self.stringValue = mostRecentCity ?? ""
@@ -318,11 +316,14 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
             return true
         }
         if commandSelector == #selector(NSResponder.insertNewline(_:)) {
-            SwiftyBeaver.verbose("interceptNewline")
             // Giving up the focus will cause 'controlTextDidEndEditing' to be called
-            if let selectedSuggestion = suggestionsController.selectedSuggestion() {
+            if let selectedSuggestion = suggestionsController?.selectedSuggestion() {
                 self.stringValue = selectedSuggestion[kSuggestionLabel] as! String
+                detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
+            } else {
+                detailValue = ""
             }
+            
             self.window?.makeFirstResponder(nil)
             endEditing()
             
@@ -331,12 +332,12 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
         if commandSelector == #selector(NSResponder.moveUp(_:)) {
             // Move up in the suggested selections list
-            suggestionsController.moveUp(textView)
+            suggestionsController?.moveUp(textView)
             return true
         }
         if commandSelector == #selector(NSResponder.moveDown(_:)) {
             // Move down in the suggested selections list
-            suggestionsController.moveDown(textView)
+            suggestionsController?.moveDown(textView)
             return true
         }
         if commandSelector == #selector(NSResponder.deleteForward(_:)) || commandSelector == #selector(NSResponder.deleteBackward(_:)) {
@@ -351,13 +352,12 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     skipNextSuggestion = (insertionRange.location != textView.string.count || insertionRange.length > 0)
                 }
             }
-            SwiftyBeaver.verbose("control skipNextSuggestion=\(skipNextSuggestion)")
             return false
         }
         if commandSelector == #selector(NSResponder.complete(_:)) {
             // The user has pressed the key combination for auto completion. AppKit has a built in auto completion. By overriding this command we prevent AppKit's auto completion and can respond to the user's intention by showing or cancelling our custom suggestions window.
-            if suggestionsController.window != nil && suggestionsController.window!.isVisible {
-                suggestionsController.cancelSuggestions()
+            if suggestionsController?.window != nil && suggestionsController!.window!.isVisible {
+                suggestionsController?.cancelSuggestions()
             } else {
                 updateSuggestions(from: control)
             }
@@ -368,3 +368,30 @@ class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
 }
 
+extension DispatchWorkItem: Equatable {
+    public static func ==(lhs: DispatchWorkItem, rhs: DispatchWorkItem) -> Bool {
+        // Compare the instances
+        return lhs === rhs
+    }
+}
+
+extension DispatchWorkItem: Hashable {
+    public var hashValue: Int {
+        // Use the instance's unique identifier for hashing
+        return ObjectIdentifier(self).hashValue
+    }
+}
+
+extension Request: Equatable {
+    public static func ==(lhs: Request, rhs: Request) -> Bool {
+        // Compare the instances
+        return lhs === rhs
+    }
+}
+
+extension Request: Hashable {
+    public var hashValue: Int {
+        // Use the instance's unique identifier for hashing
+        return ObjectIdentifier(self).hashValue
+    }
+}

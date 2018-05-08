@@ -40,6 +40,7 @@
  Copyright (C) 2012 Apple Inc. All Rights Reserved.
  */
 import Cocoa
+import SwiftyBeaver
 
 let kTrackerKey = "whichImageView"
 let kThumbnailWidth: CGFloat = 24.0
@@ -52,7 +53,7 @@ let kSuggestionDetailedLabel = "detailedLabel"
 class SuggestionsWindowController: NSWindowController {
     var action: Selector?
     var target: Any?
-    private var parentTextField: NSTextField?
+    private var parentTextField: SearchBox?
     private var suggestions = [[String: Any]]()
     private var viewControllers = [NSViewController]()
     private var trackingAreas = [AnyHashable]()
@@ -91,12 +92,14 @@ class SuggestionsWindowController: NSWindowController {
      */
     func userSetSelectedView(_ view: NSView?) {
         selectedView = view
-        NSApp.sendAction(action!, to: target, from: self)
+        if action != nil {
+            NSApp.sendAction(action!, to: target, from: self)
+        }
     }
 
     /* Position and lay out the suggestions window, set up auto cancelling tracking, and wires up the logical relationship for accessibility.
      */
-    func begin(for parentTextField: NSTextField?) {
+    func begin(for parentTextField: SearchBox?) {
         let suggestionWindow: NSWindow? = window
         let parentWindow: NSWindow? = parentTextField?.window
         let parentFrame: NSRect? = parentTextField?.frame
@@ -265,7 +268,9 @@ class SuggestionsWindowController: NSWindowController {
         // offset the Y posistion so that the suggetion view does not try to draw past the rounded corners.
         for entry: [String: Any] in suggestions {
             frame.origin.y += frame.size.height
-            let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: nil)
+
+            let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
+            let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: frameworkBundle)
             let view = viewController.view as? HighlightingView
             // Make the selectedView the samee as the 0th.
             if viewControllers.count == 0 {
@@ -336,6 +341,7 @@ class SuggestionsWindowController: NSWindowController {
     override func mouseUp(with theEvent: NSEvent) {
         if let selectedSuggestion = selectedSuggestion() {
             parentTextField?.stringValue = selectedSuggestion[kSuggestionLabel] as! String
+            parentTextField?.detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
         }
         parentTextField?.validateEditing()
         parentTextField?.abortEditing()

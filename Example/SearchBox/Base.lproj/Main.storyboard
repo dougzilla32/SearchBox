@@ -721,6 +721,9 @@
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </searchFieldCell>
+                                <connections>
+                                    <action selector="searchMe:" target="XfG-lQ-9wD" id="opa-9d-5aY"/>
+                                </connections>
                             </searchField>
                         </subviews>
                         <constraints>
@@ -728,6 +731,9 @@
                             <constraint firstItem="vot-Iv-udW" firstAttribute="centerX" secondItem="m2S-Jp-Qdl" secondAttribute="centerX" id="vWw-c5-yxj"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="searchBox" destination="vot-Iv-udW" id="vsJ-FP-7fJ"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

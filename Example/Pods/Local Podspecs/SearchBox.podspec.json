@@ -16,10 +16,15 @@
     "tag": "0.1.0"
   },
   "platforms": {
-    "osx": "10.10"
+    "osx": "10.11"
   },
   "source_files": "SearchBox/Classes/**/*",
   "swift_version": "4.1",
+  "resource_bundles": {
+    "SearchBox": [
+      "SearchBox/**/*.xib"
+    ]
+  },
   "dependencies": {
     "Alamofire": [
       "~> 4.6"
@@ -29,6 +34,12 @@
     ],
     "PromiseKit/Alamofire": [
       "~> 6.0"
+    ],
+    "CancelForPromiseKit": [
+      "~> 1.0"
+    ],
+    "CancelForPromiseKit/Alamofire": [
+      "~> 1.0"
     ],
     "SwiftyBeaver": [
       "~> 1.5"

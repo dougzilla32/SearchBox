@@ -8,9 +8,8 @@
 
 import Alamofire
 import PromiseKit
+import CancelForPromiseKit
 
-protocol SearchBoxDelegate {
-    func completions(for text: String) -> (Request?, Promise<[(String,String)]>)
-    
-    func search(for text: String)
+public protocol SearchBoxDelegate {
+    func completions(for text: String, context: CancelContext) -> Promise<[(String,String)]>
 }

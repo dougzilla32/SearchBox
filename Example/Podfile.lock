@@ -1,5 +1,17 @@
 PODS:
   - Alamofire (4.7.2)
+  - CancelForPromiseKit (1.0.0):
+    - CancelForPromiseKit/CorePromise (= 1.0.0)
+    - CancelForPromiseKit/Foundation (= 1.0.0)
+  - CancelForPromiseKit/Alamofire (1.0.0):
+    - Alamofire (~> 4.0)
+    - CancelForPromiseKit/CorePromise
+    - PromiseKit/Alamofire (~> 6.0)
+  - CancelForPromiseKit/CorePromise (1.0.0):
+    - PromiseKit/CorePromise (~> 6.0)
+  - CancelForPromiseKit/Foundation (1.0.0):
+    - CancelForPromiseKit/CorePromise
+    - PromiseKit/Foundation (~> 6.0)
   - PromiseKit (6.2.5):
     - PromiseKit/CorePromise (= 6.2.5)
     - PromiseKit/Foundation (= 6.2.5)
@@ -12,15 +24,16 @@ PODS:
     - PromiseKit/CorePromise
   - SearchBox (0.1.0):
     - Alamofire (~> 4.6)
+    - CancelForPromiseKit (~> 1.0)
+    - CancelForPromiseKit/Alamofire (~> 1.0)
     - PromiseKit (~> 6.0)
     - PromiseKit/Alamofire (~> 6.0)
     - SwiftyBeaver (~> 1.5)
   - SwiftyBeaver (1.5.2)
 
 DEPENDENCIES:
-  - Alamofire (~> 4.6)
-  - PromiseKit (~> 6.0)
-  - PromiseKit/Alamofire (~> 6.0)
+  - CancelForPromiseKit/Alamofire (from `~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit`)
+  - CancelForPromiseKit/CorePromise (from `~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit`)
   - SearchBox (from `../`)
   - SwiftyBeaver (~> 1.5)
 
@@ -31,15 +44,18 @@ SPEC REPOS:
     - SwiftyBeaver
 
 EXTERNAL SOURCES:
+  CancelForPromiseKit:
+    :path: "~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit"
   SearchBox:
     :path: "../"
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  CancelForPromiseKit: 43b262a9c71db8b5912b92410e5f34ebc23d6a60
   PromiseKit: a26828b0a8d5874960dfdb575b57a70790ec36f1
-  SearchBox: 1a9eba0be8965da1a4c667c2868c038c78bb5ba0
+  SearchBox: d1b0b131dc406627b9e157ebdb6a29e85d7d4ee0
   SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
 
-PODFILE CHECKSUM: ba730f61fb1a70e199d1de9d4a98e2b962abbb5d
+PODFILE CHECKSUM: 4a18b596a99e0ab6e8294ea0681aa29227925f4a
 
 COCOAPODS: 1.5.0

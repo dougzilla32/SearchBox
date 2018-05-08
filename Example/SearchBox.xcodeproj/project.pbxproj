@@ -27,7 +27,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		407B2AE1D76591E93B04823A /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		474F98713E4C0D3E636881AE /* Pods-SearchBox_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SearchBox_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SearchBox_Example/Pods-SearchBox_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		567BB2F44665718DDDA91869 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		66505206C26CB333D3C956CA /* Pods_SearchBox_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SearchBox_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,7 +134,6 @@
 			isa = PBXGroup;
 			children = (
 				6C4C6B49CCF1E89BAF04170D /* SearchBox.podspec */,
-				407B2AE1D76591E93B04823A /* README.md */,
 				567BB2F44665718DDDA91869 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
@@ -268,6 +266,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-SearchBox_Example/Pods-SearchBox_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/CancelForPromiseKit/CancelForPromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/SearchBox/SearchBox.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
@@ -275,6 +274,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CancelForPromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SearchBox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",

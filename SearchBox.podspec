@@ -29,7 +29,7 @@ Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform = :osx
-  s.osx.deployment_target = "10.10"
+  s.osx.deployment_target = "10.11"
 
   s.source_files = 'SearchBox/Classes/**/*'
 
@@ -45,5 +45,7 @@ Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
   s.dependency 'Alamofire', '~> 4.6'
   s.dependency 'PromiseKit', '~> 6.0'
   s.dependency 'PromiseKit/Alamofire', '~> 6.0'
+  s.dependency 'CancelForPromiseKit', '~> 1.0'
+  s.dependency 'CancelForPromiseKit/Alamofire', '~> 1.0'
   s.dependency 'SwiftyBeaver', '~> 1.5'
 end
