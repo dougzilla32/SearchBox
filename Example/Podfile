@@ -1,14 +1,15 @@
+platform :osx, '10.11'
 use_frameworks!
 
 target 'SearchBox_Example' do
     pod 'SearchBox', :path => '../'
 
-#    pod 'Alamofire', '~> 4.0'
-#    pod 'PromiseKit', '~> 6.0'
-#    pod 'PromiseKit/Alamofire', '~> 6.0'
-    pod 'SwiftyBeaver', '~> 1.5'
+    pod 'Alamofire', '~> 4.0'
+    pod 'PromiseKit', '~> 6.0'
+    pod 'PromiseKit/Alamofire', '~> 6.0'
     pod 'CancelForPromiseKit/CorePromise', :path => '~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit'
     pod 'CancelForPromiseKit/Alamofire', :path => '~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit'
+    pod 'SwiftyBeaver', '~> 1.5'
 
   target 'SearchBox_Tests' do
     inherit! :search_paths

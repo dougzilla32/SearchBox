@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SearchBox'
-  s.version          = '0.1.0'
+  s.version          = '1.0.0'
   s.summary          = 'A subclass of NSSearchField that provides a completions drop-down menu'
 
 # This description is used to generate tags and improve search results.
@@ -18,7 +18,9 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-Ths CocoaPod provides the ability to add a completions menu to an NSSearchField.
+This CocoaPod provides a subclass of NSSearchField called 'SearchBox', which has a completions drop-down menu akin to modern search fields such as the google search field.  It is a modified Swift port of the "CustomMenus" sample project from Apple:
+
+https://developer.apple.com/library/content/samplecode/CustomMenus
                        DESC
 
   s.homepage         = 'https://github.com/dougzilla32/SearchBox'
