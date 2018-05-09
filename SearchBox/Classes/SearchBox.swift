@@ -1,6 +1,6 @@
 //
 //  SearchBox.swift
-//  WeatherCheck
+//  SearchBox
 //
 //  Created by Doug Stein on 4/13/18.
 //  Copyright © 2018 Doug Stein. All rights reserved.
@@ -41,7 +41,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    private var searchHistory: SearchHistory?
+    public internal(set) var searchHistory: SearchHistory?
     
     // If set to true, select all the text when we get a mouseDown event
     private var wantsSelectAll = false
@@ -66,6 +66,11 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         self.delegate = self
         self.sendsSearchStringImmediately = true
         self.sendsWholeSearchString = true
+    }
+    
+    override public func awakeFromNib() {
+        super.awakeFromNib()
+        setup()
     }
     
     override public func becomeFirstResponder() -> Bool {
@@ -167,7 +172,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
         
         return after(seconds: 0.2, cancel: cancelContext).then {
-            searchDelegate.completions(for: self.stringValue, context: self.cancelContext)
+            return searchDelegate.completions(for: self.stringValue, cancel: self.cancelContext)
         }.map { cities -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()

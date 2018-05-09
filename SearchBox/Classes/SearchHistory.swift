@@ -1,6 +1,6 @@
 //
 //  SearchHistory.swift
-//  WeatherCheck
+//  SearchBox
 //
 //  Created by Doug Stein on 4/16/18.
 //  Copyright © 2018 Doug Stein. All rights reserved.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SearchHistory: Sequence {
+public class SearchHistory: Sequence {
     var first: SearchHistoryItem
     var last: SearchHistoryItem
     var map = [String: SearchHistoryItem]()
@@ -21,7 +21,7 @@ class SearchHistory: Sequence {
         self.limit = Swift.max(limit, 2)
     }
     
-    func add(name: String, detail: String) {
+    public func add(name: String, detail: String) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
             if item.name == last.name {
@@ -43,18 +43,18 @@ class SearchHistory: Sequence {
         last = item
     }
     
-    func makeIterator() -> SearchHistory.SearchHistoryIterator {
+    public func makeIterator() -> SearchHistory.SearchHistoryIterator {
         return SearchHistoryIterator(item: last)
     }
     
-    struct SearchHistoryIterator: IteratorProtocol {
+    public struct SearchHistoryIterator: IteratorProtocol {
         var currentItem: SearchHistoryItem
         
         init(item: SearchHistoryItem) {
             currentItem = item
         }
     
-        mutating func next() -> SearchHistoryItem? {
+        public mutating func next() -> SearchHistoryItem? {
             var item: SearchHistoryItem? = nil
             if let prev = currentItem.prev {
                 item = currentItem
@@ -65,12 +65,12 @@ class SearchHistory: Sequence {
     }
 }
 
-class SearchHistoryItem {
+public class SearchHistoryItem {
     var prev: SearchHistoryItem?
     var next: SearchHistoryItem?
-    var name: String
-    var detail: String
-    var timestamp: Date
+    public var name: String
+    public var detail: String
+    public var timestamp: Date
     
     init(name: String, detail: String) {
         self.name = name
