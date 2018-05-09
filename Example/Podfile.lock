@@ -1,0 +1,64 @@
+PODS:
+  - Alamofire (4.7.2)
+  - CancelForPromiseKit (1.0.0):
+    - CancelForPromiseKit/CorePromise (= 1.0.0)
+    - CancelForPromiseKit/Foundation (= 1.0.0)
+  - CancelForPromiseKit/Alamofire (1.0.0):
+    - Alamofire (~> 4.0)
+    - CancelForPromiseKit/CorePromise
+    - PromiseKit/Alamofire (~> 6.0)
+  - CancelForPromiseKit/CorePromise (1.0.0):
+    - PromiseKit/CorePromise (~> 6.0)
+  - CancelForPromiseKit/Foundation (1.0.0):
+    - CancelForPromiseKit/CorePromise
+    - PromiseKit/Foundation (~> 6.0)
+  - PromiseKit (6.2.5):
+    - PromiseKit/CorePromise (= 6.2.5)
+    - PromiseKit/Foundation (= 6.2.5)
+    - PromiseKit/UIKit (= 6.2.5)
+  - PromiseKit/Alamofire (6.2.5):
+    - Alamofire (~> 4.0)
+    - PromiseKit/CorePromise
+  - PromiseKit/CorePromise (6.2.5)
+  - PromiseKit/Foundation (6.2.5):
+    - PromiseKit/CorePromise
+  - SearchBox (1.0.0):
+    - Alamofire (~> 4.6)
+    - CancelForPromiseKit (~> 1.0)
+    - CancelForPromiseKit/Alamofire (~> 1.0)
+    - PromiseKit (~> 6.0)
+    - PromiseKit/Alamofire (~> 6.0)
+    - SwiftyBeaver (~> 1.5)
+  - SwiftyBeaver (1.5.2)
+
+DEPENDENCIES:
+  - Alamofire (~> 4.0)
+  - CancelForPromiseKit/Alamofire (from `~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit`)
+  - CancelForPromiseKit/CorePromise (from `~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit`)
+  - PromiseKit (~> 6.0)
+  - PromiseKit/Alamofire (~> 6.0)
+  - SearchBox (from `../`)
+  - SwiftyBeaver (~> 1.5)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Alamofire
+    - PromiseKit
+    - SwiftyBeaver
+
+EXTERNAL SOURCES:
+  CancelForPromiseKit:
+    :path: "~/Desktop/Dropbox/Xcode Projects/Libraries/CancelForPromiseKit"
+  SearchBox:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
+  CancelForPromiseKit: 43b262a9c71db8b5912b92410e5f34ebc23d6a60
+  PromiseKit: a26828b0a8d5874960dfdb575b57a70790ec36f1
+  SearchBox: f29af60babb593e15f16f942243446ca6c47684d
+  SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af
+
+PODFILE CHECKSUM: f9dd0229a974f777bf79441137b4d6edcb4d849a
+
+COCOAPODS: 1.5.0

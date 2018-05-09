@@ -12,18 +12,19 @@ import PromiseKit
 import CancelForPromiseKit
 import SwiftyBeaver
 
+@IBDesignable
 public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // Delegate for this search box
     public var searchBoxDelegate: SearchBoxDelegate?
     
     // Do not take the focus if set to true
-    public var refuseFocus = false
+    public var refuseFocus: Bool = false
     
     // Indicates if we should show completions as highlighted text in the text field
-    public var fillInCompletions = false
+    @IBInspectable public var fillCompletions: Bool = false
     
     // Indicates if we should hide the cancel button when the field does not have the focus
-    public var hideCancelButton = false
+    @IBInspectable public var hideCancelButton: Bool = false
 
     // If set to a number greater than zero, the SearchBox keeps track of this many items
     // it it's search history
@@ -199,7 +200,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
         
         let text: String?
-        if fillInCompletions {
+        if fillCompletions {
             // Only use the text up to the caret position
             let selection: NSRange? = fieldEditor.selectedRange
             text = (selection != nil) ? (fieldEditor.string as NSString?)?.substring(to: selection!.location) : nil
@@ -348,7 +349,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         if commandSelector == #selector(NSResponder.deleteForward(_:)) || commandSelector == #selector(NSResponder.deleteBackward(_:)) {
             /* The user is deleting the highlighted portion of the suggestion or more. Return NO so that the field editor performs the deletion. The field editor will then call -controlTextDidChange:. We don't want to provide a new set of suggestions as that will put back the characters the user just deleted. Instead, set skipNextSuggestion to YES which will cause -controlTextDidChange: to cancel the suggestions window. (see -controlTextDidChange: above)
              */
-            if fillInCompletions {
+            if fillCompletions {
                 // Disabled by default as modern search fields do not do this.
                 let insertionRange = textView.selectedRanges[0].rangeValue
                 if commandSelector == #selector(NSResponder.deleteBackward(_:)) {
