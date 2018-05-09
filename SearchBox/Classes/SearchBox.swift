@@ -258,12 +258,21 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     private func endEditing() {
         cancelEditing()
-        mostRecentCity = self.stringValue
 
-        searchHistory?.add(name: self.stringValue, detail: detailValue)
-        sendAction(action, to: target)
+        if self.stringValue != "" {
+            mostRecentCity = self.stringValue
+            searchHistory?.add(name: self.stringValue, detail: detailValue)
+            sendAction(action, to: target)
+        }
     }
     
+    // Workaround for bug where the NSSearchField sends an action event when the user selects all the text and presses the delete key.
+    @discardableResult
+    override open func sendAction(_ action: Selector?, to target: Any?) -> Bool {
+        return stringValue != "" ? super.sendAction(action, to: target) : false
+    }
+
+
     // MARK: NSTextFieldDelegate
     
     override public func textDidEndEditing(_ notification: Notification) {

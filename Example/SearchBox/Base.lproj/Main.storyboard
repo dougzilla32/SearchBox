@@ -711,9 +711,9 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <searchField wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vot-Iv-udW" customClass="SearchBox" customModule="SearchBox">
-                                <rect key="frame" x="107" y="124" width="267" height="22"/>
+                                <rect key="frame" x="91" y="124" width="300" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="267" id="LJL-ja-zGa"/>
+                                    <constraint firstAttribute="width" constant="300" id="LJL-ja-zGa"/>
                                     <constraint firstAttribute="height" constant="22" id="yyv-99-gxm"/>
                                 </constraints>
                                 <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" id="QD9-wf-O1H">
