@@ -93,7 +93,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 self.stringValue = ""
                 
                 // Let the delegate know the text changed
-                NotificationCenter.default.post(name: NSControl.textDidChangeNotification, object: self, userInfo: ["NSFieldEditor": self.window!.fieldEditor(true, for: self)!])
+                NotificationCenter.default.post(name: NSControl.textDidBeginEditingNotification, object: self, userInfo: ["NSFieldEditor": self.window!.fieldEditor(true, for: self)!])
             } else {
                 super.mouseDown(with: event)
             }
