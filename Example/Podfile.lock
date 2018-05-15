@@ -54,7 +54,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  CancelForPromiseKit: 43b262a9c71db8b5912b92410e5f34ebc23d6a60
+  CancelForPromiseKit: a3fc79e2f3f3adfe4a99bfe6d3848fbbda1c763d
   PromiseKit: a26828b0a8d5874960dfdb575b57a70790ec36f1
   SearchBox: f29af60babb593e15f16f942243446ca6c47684d
   SwiftyBeaver: 85daaaa2b3ae6e31b7b55c99430e8b91dac088af

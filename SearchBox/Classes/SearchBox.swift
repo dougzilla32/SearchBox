@@ -119,7 +119,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         // The NSText editor took the focus from this NSSearchField, so effectively we have the focus
         if currentEditor() != nil {
             // Show the cancel button while we have the focus
-            if cancelButtonCell != nil {
+            if hideCancelButton && cancelButtonCell != nil {
                 (cell as? NSSearchFieldCell)?.cancelButtonCell = cancelButtonCell
                 cancelButtonCell = nil
             }
@@ -155,12 +155,10 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     func cancelAllRequests() {
         cancelContext.cancel()
-        cancelContext.reset()
+        cancelContext.done()
     }
     
     func suggestions(forText text: String) -> Promise<[[String: Any]]> {
-        cancelAllRequests()
-        
         let searchDelegate: SearchBoxDelegate! = self.searchBoxDelegate
         if text == "" || searchDelegate == nil {
             var suggestions = [[String: Any]]()
@@ -169,12 +167,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
                 }
             }
-            return Promise.value(suggestions, cancel: cancelContext)
+            return Promise.valueCC(suggestions)
         }
         
-        return after(seconds: 0.2, cancel: cancelContext).then {
-            return searchDelegate.completions(for: self.stringValue, cancel: self.cancelContext)
-        }.map { cities -> [[String: Any]] in
+        return afterCC(seconds: 0.2).thenCC {
+            searchDelegate.completions(for: self.stringValue)
+        }.mapCC { cities -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
@@ -208,9 +206,11 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             text = fieldEditor.string
         }
         
-        firstly {
+        cancelAllRequests()
+        
+        firstlyCC(cancel: cancelContext) {
             self.suggestions(forText: text ?? "")
-        }.done { suggestions in
+        }.doneCC { suggestions in
             if suggestions.count > 0 {
                 // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
                 let suggestion = suggestions[0]
@@ -223,7 +223,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 // No suggestions. Cancel the suggestion window.
                 self.cancelSuggestions()
             }
-        }.catch(policy: .allErrorsExceptCancellation) { error in
+        }.catchCC(policy: .allErrorsExceptCancellation) { error in
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
         }
@@ -261,7 +261,6 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
         if self.stringValue != "" {
             mostRecentCity = self.stringValue
-            searchHistory?.add(name: self.stringValue, detail: detailValue)
             sendAction(action, to: target)
         }
     }
@@ -269,7 +268,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // Workaround for bug where the NSSearchField sends an action event when the user selects all the text and presses the delete key.
     @discardableResult
     override open func sendAction(_ action: Selector?, to target: Any?) -> Bool {
-        return stringValue != "" ? super.sendAction(action, to: target) : false
+        guard stringValue != "" else {
+            return false
+        }
+        
+        let rv = super.sendAction(action, to: target)
+        searchHistory?.add(name: self.stringValue, detail: detailValue)
+        return rv
     }
 
 
@@ -277,13 +282,11 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     override public func textDidEndEditing(_ notification: Notification) {
         super.textDidEndEditing(notification)
-        if hideCancelButton {
-            if currentEditor() == nil {
-                // The NSText editor is cancelled, so effectively we resigned the focus.
-                // Hide the cancel button when we do not have the focus.
-                cancelButtonCell = (cell as? NSSearchFieldCell)?.cancelButtonCell
-                (cell as? NSSearchFieldCell)?.cancelButtonCell = nil
-            }
+        if hideCancelButton && currentEditor() == nil {
+            // The NSText editor is cancelled, so effectively we resigned the focus.
+            // Hide the cancel button when we do not have the focus.
+            cancelButtonCell = (cell as? NSSearchFieldCell)?.cancelButtonCell
+            (cell as? NSSearchFieldCell)?.cancelButtonCell = nil
         }
     }
 

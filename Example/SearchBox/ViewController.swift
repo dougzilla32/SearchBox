@@ -13,14 +13,14 @@ import PromiseKit
 import CancelForPromiseKit
 
 class ViewController: NSViewController, SearchBoxDelegate {
-    func completions(for text: String, cancel context: CancelContext) -> Promise<[(String, String)]> {
+    func completions(for text: String) -> Promise<[(String, String)]> {
         var completions = [(String, String)]()
         if let spellCompletions = NSSpellChecker.shared.completions(forPartialWordRange: NSMakeRange(0, text.count), in: text, language: nil, inSpellDocumentWithTag: 0) {
             for s in spellCompletions {
                 completions.append((s, "us"))
             }
         }
-        return Promise.value(completions, cancel: context)
+        return Promise.valueCC(completions)
     }
     
     @IBAction func searchMe(_ sender: Any) {
