@@ -155,7 +155,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     func cancelAllRequests() {
         cancelContext.cancel()
-        cancelContext.done()
+        cancelContext = CancelContext()
     }
     
     func suggestions(forText text: String) -> Promise<[[String: Any]]> {
