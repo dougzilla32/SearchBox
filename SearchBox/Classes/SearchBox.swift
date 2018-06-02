@@ -150,15 +150,15 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    var cancelContext = CancelContext()
+    var cancelContext: CancelContext?
     private var mostRecentCity: String?
 
     func cancelAllRequests() {
-        cancelContext.cancel()
-        cancelContext = CancelContext()
+        cancelContext?.cancel()
+        cancelContext = nil
     }
     
-    func suggestions(forText text: String) -> Promise<[[String: Any]]> {
+    func suggestions(forText text: String) -> CancellablePromise<[[String: Any]]> {
         let searchDelegate: SearchBoxDelegate! = self.searchBoxDelegate
         if text == "" || searchDelegate == nil {
             var suggestions = [[String: Any]]()
@@ -167,12 +167,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
                 }
             }
-            return Promise.valueCC(suggestions)
+            return CancellablePromise.value(suggestions)
         }
         
-        return afterCC(seconds: 0.2).thenCC {
+        return afterCC(seconds: 0.2).then {
             searchDelegate.completions(for: self.stringValue)
-        }.mapCC { cities -> [[String: Any]] in
+        }.map { cities -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
@@ -208,9 +208,9 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         
         cancelAllRequests()
         
-        firstlyCC(cancel: cancelContext) {
+        cancelContext = firstly {
             self.suggestions(forText: text ?? "")
-        }.doneCC { suggestions in
+        }.done { suggestions in
             if suggestions.count > 0 {
                 // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
                 let suggestion = suggestions[0]
@@ -223,10 +223,10 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 // No suggestions. Cancel the suggestion window.
                 self.cancelSuggestions()
             }
-        }.catchCC(policy: .allErrorsExceptCancellation) { error in
+        }.catch(policy: .allErrorsExceptCancellation) { error in
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
-        }
+        }.cancelContext
     }
     
     /* Update the field editor with a suggested string. The additional suggested characters are auto selected.
