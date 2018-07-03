@@ -167,7 +167,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
                 }
             }
-            return CancellablePromise.value(suggestions)
+            return CancellablePromise.valueCC(suggestions)
         }
         
         return afterCC(seconds: 0.2).then {

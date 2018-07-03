@@ -20,7 +20,7 @@ class ViewController: NSViewController, SearchBoxDelegate {
                 completions.append((s, "us"))
             }
         }
-        return CancellablePromise.value(completions)
+        return CancellablePromise.valueCC(completions)
     }
     
     @IBAction func searchMe(_ sender: Any) {
