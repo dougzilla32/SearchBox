@@ -42,6 +42,19 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
+    private var mostRecentSearch: String?
+
+    override open var stringValue: String {
+        get {
+            return super.stringValue
+        }
+        
+        set {
+            super.stringValue = newValue
+            mostRecentSearch = newValue
+        }
+    }
+    
     public internal(set) var searchHistory: SearchHistory?
     
     // If set to true, select all the text when we get a mouseDown event
@@ -90,7 +103,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             if mouse(location, in: rect) {
                 // Intercept the cancelButtonCell mouseDown event -- the default behavior causes
                 // the search field to give up the focus which is not our desired behavior.
-                self.stringValue = ""
+                super.stringValue = ""
                 
                 // Let the delegate know the text changed
                 NotificationCenter.default.post(name: NSControl.textDidBeginEditingNotification, object: self, userInfo: ["NSFieldEditor": self.window!.fieldEditor(true, for: self)!])
@@ -151,7 +164,6 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     var cancelContext: CancelContext?
-    private var mostRecentCity: String?
 
     func cancelAllRequests() {
         cancelContext?.cancel()
@@ -256,12 +268,19 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         self.window?.makeFirstResponder(nil)
     }
     
+    func revertEditing() {
+        super.stringValue = mostRecentSearch ?? ""
+        cancelEditing()
+    }
+    
     private func endEditing() {
         cancelEditing()
 
         if self.stringValue != "" {
-            mostRecentCity = self.stringValue
+            mostRecentSearch = self.stringValue
             sendAction(action, to: target)
+        } else if mostRecentSearch != nil {
+            super.stringValue = mostRecentSearch!
         }
     }
     
@@ -329,14 +348,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     public func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if commandSelector == #selector(NSResponder.cancelOperation(_:)) {
             // Revert to previous city when escape key is pressed
-            self.stringValue = mostRecentCity ?? ""
-            cancelEditing()
+            revertEditing()
             return true
         }
         if commandSelector == #selector(NSResponder.insertNewline(_:)) {
             // Giving up the focus will cause 'controlTextDidEndEditing' to be called
             if let selectedSuggestion = suggestionsController?.selectedSuggestion() {
-                self.stringValue = selectedSuggestion[kSuggestionLabel] as! String
+                super.stringValue = selectedSuggestion[kSuggestionLabel] as! String
                 detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
             } else {
                 detailValue = ""

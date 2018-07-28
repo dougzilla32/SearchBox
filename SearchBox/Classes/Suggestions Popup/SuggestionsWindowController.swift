@@ -130,8 +130,6 @@ class SuggestionsWindowController: NSWindowController {
             NSAccessibilityPostNotification(winD, .created)
         }
         // setup auto cancellation if the user clicks outside the suggestion window and parent text field. Note: this is a local event monitor and will only catch clicks in windows that belong to this application. We use another technique below to catch clicks in other application windows.
-        /*
-         NOTE: do not cancel the suggestions window for mouse down (prefer this behavior)
         localMouseDownEventMonitor = NSEvent.addLocalMonitorForEvents(matching: [NSEvent.EventTypeMask.leftMouseDown, NSEvent.EventTypeMask.rightMouseDown, NSEvent.EventTypeMask.otherMouseDown], handler: {(_ event: NSEvent) -> NSEvent? in
             // If the mouse event is in the suggestion window, then there is nothing to do.
             var event: NSEvent! = event
@@ -143,21 +141,33 @@ class SuggestionsWindowController: NSWindowController {
                      */
                     let contentView: NSView? = parentWindow?.contentView
                     let locationTest: NSPoint? = contentView?.convert(event.locationInWindow, from: nil)
-                    let hitView: NSView? = contentView?.hitTest(locationTest ?? NSPoint.zero)
+                    
+                    let hitViews = contentView?.allViews(at: locationTest ?? NSPoint.zero) ?? []
                     let fieldEditor: NSText? = parentTextField?.currentEditor()
-                    if hitView != parentTextField && ((fieldEditor != nil) && hitView != fieldEditor) {
+                    var insideParentTextField = false
+                    for view in hitViews {
+                        if view == parentTextField || ((fieldEditor != nil) && view == fieldEditor) {
+                            insideParentTextField = true
+                            break
+                        }
+                    }
+                    if !insideParentTextField {
+                        // Revert to original text value
+                        parentTextField?.revertEditing()
                         // Since the click is not in the parent text field, return nil, so the parent window does not try to process it, and cancel the suggestion window.
                         event = nil
                         self.cancelSuggestions()
                     }
                 } else {
                     // Not in the suggestion window, and not in the parent window. This must be another window or palette for this application.
+                    // Revert to original text value
+                    parentTextField?.revertEditing()                    
+                    // Cancel the suggestion window
                     self.cancelSuggestions()
                 }
             }
             return event
         })
-         */
         // as per the documentation, do not retain event monitors.
         // We also need to auto cancel when the window loses key status. This may be done via a mouse click in another window, or via the keyboard (cmd-~ or cmd-tab), or a notificaiton. Observing NSWindowDidResignKeyNotification catches all of these cases and the mouse down event monitor catches the other cases.
         lostFocusObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResignKeyNotification, object: parentWindow, queue: nil, using: {(_ arg1: Notification) -> Void in
@@ -386,3 +396,22 @@ class SuggestionsWindowController: NSWindowController {
         }
     }
 }
+
+extension NSView {
+    func allViews(at point: NSPoint) -> [NSView] {
+        var stack = [NSView]()
+        var result = [NSView]()
+        
+        stack.append(self)
+        while let view = stack.popLast() {
+            let localPoint = view.convert(point, from: self)
+            
+            if view.bounds.contains(localPoint) {
+                result.append(view)
+            }
+            stack.append(contentsOf: view.subviews)
+        }
+        return result
+    }
+}
+
