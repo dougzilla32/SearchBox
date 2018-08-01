@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: NSImageThumbnailExtensions.m
+ File: NSImageThumbnailExtensions.swift
  Abstract: A category on NSImage to create a thumbnail sized NSImage from an image URL.
  Version: 1.4
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple

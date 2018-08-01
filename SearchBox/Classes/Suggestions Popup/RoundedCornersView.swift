@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: RoundedCornersView.m
+ File: RoundedCornersView.swift
  Abstract: A view that draws a rounded rect with the window background. It is used to draw the background for the suggestions window and expose the suggestions to accessibility.
  Version: 1.4
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple

@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: HighlightingView.m
+ File: HighlightingView.swift
  Abstract: A simple view that draws menu-like highlighting and exposes its containing views as a suggestion for accessibility.
  Version: 1.4
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple

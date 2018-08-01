@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: SuggestionsWindow.m
+ File: SuggestionsWindow.swift
  Abstract: A custom window that acts as a popup menu of sorts.  Since this isn't semantically a window, we ignore it for accessibility purposes. However, we need to inform accessibility of the logical relationship between this window and it parent UI element in the parent window.
  Version: 1.4 
  

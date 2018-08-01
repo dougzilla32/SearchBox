@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: SuggestionsWindowController.m
+ File: SuggestionsWindowController.swift
  Abstract: The controller for the suggestions popup window. This class handles creating, displaying, and event tracking of the suggestion popup window.
  Version: 1.4
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple

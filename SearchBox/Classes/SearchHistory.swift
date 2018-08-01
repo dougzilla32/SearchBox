@@ -3,18 +3,16 @@
 //  SearchBox
 //
 //  Created by Doug Stein on 4/16/18.
-//  Copyright © 2018 Doug Stein. All rights reserved.
 //
 
 import Foundation
 
 public class SearchHistory: Sequence {
-    var first: SearchHistoryItem
-    var last: SearchHistoryItem
-    var map = [String: SearchHistoryItem]()
-    var count = 0
-    var limit: Int
-    
+    private var first: SearchHistoryItem
+    private var last: SearchHistoryItem
+    public internal(set) var limit: Int
+    public internal(set) var map = [String: SearchHistoryItem]()
+
     init(limit: Int) {
         first = SearchHistoryItem(name: "", detail: "")
         last = first
@@ -28,14 +26,13 @@ public class SearchHistory: Sequence {
                 last = last.prev!
             }
             item.remove()
-            item.timestamp = Date()
         } else {
             item = SearchHistoryItem(name: name, detail: detail)
-            count += 1
             map[name] = item
-            if count > limit {
-                first.next!.remove()
-                count -= 1
+            if map.count > limit {
+                let item = first.next!
+                map[item.name] = nil
+                item.remove()
             }
         }
         last.next = item
@@ -70,6 +67,7 @@ public class SearchHistoryItem {
     var next: SearchHistoryItem?
     public var name: String
     public var detail: String
+    public var cachedData: Any?
     public var timestamp: Date
     
     init(name: String, detail: String) {

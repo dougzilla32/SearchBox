@@ -3,7 +3,6 @@
 //  SearchBox
 //
 //  Created by Doug Stein on 4/13/18.
-//  Copyright © 2018 Doug Stein. All rights reserved.
 //
 
 import Alamofire
@@ -27,10 +26,10 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     @IBInspectable public var hideCancelButton: Bool = false
 
     // If set to a number greater than zero, the SearchBox keeps track of this many items
-    // it it's search history
+    // it it's search history.  Setting this value clears any existing history.
     public var searchHistoryCount: Int {
         get {
-            return searchHistory?.count ?? 0
+            return searchHistory?.map.count ?? 0
         }
         
         set {
@@ -52,6 +51,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         set {
             super.stringValue = newValue
             mostRecentSearch = newValue
+            searchHistory?.add(name: newValue, detail: detailValue)
         }
     }
     
@@ -284,16 +284,15 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    // Workaround for bug where the NSSearchField sends an action event when the user selects all the text and presses the delete key.
     @discardableResult
     override open func sendAction(_ action: Selector?, to target: Any?) -> Bool {
+        // Workaround for bug where the NSSearchField sends an action event when the user selects all
+        // the text and presses the delete key.
         guard stringValue != "" else {
             return false
         }
         
-        let rv = super.sendAction(action, to: target)
-        searchHistory?.add(name: self.stringValue, detail: detailValue)
-        return rv
+        return super.sendAction(action, to: target)
     }
 
 

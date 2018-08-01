@@ -1,6 +1,6 @@
 //  Converted to Swift 4 by Swiftify v4.1.6654 - https://objectivec2swift.com/
 /*
- File: SuggestibleTextFieldCell.m
+ File: SuggestibleTextFieldCell.swift
  Abstract: A custom text field cell to perform two tasks. Draw with white text on a dark background, and expose any associated suggestion window as our accessibility child.
  Version: 1.4
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple
