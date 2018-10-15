@@ -8,7 +8,6 @@
 
 import Cocoa
 import SearchBox
-import Alamofire
 import PromiseKit
 
 class ViewController: NSViewController, NSWindowDelegate, SearchBoxDelegate {

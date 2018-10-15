@@ -44,8 +44,6 @@ https://developer.apple.com/library/content/samplecode/CustomMenus
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'Cocoa'
   
-  s.dependency 'Alamofire', '~> 4.6'
-  s.dependency 'PromiseKit/CorePromise', '~> 7.0'
-  s.dependency 'PromiseKit/Alamofire', '~> 7.0'
+  s.dependency 'PromiseKit/CorePromise', '~> 6.5'
   s.dependency 'SwiftyBeaver', '~> 1.5'
 end

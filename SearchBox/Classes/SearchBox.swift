@@ -5,7 +5,6 @@
 //  Created by Doug Stein on 4/13/18.
 //
 
-import Alamofire
 import Cocoa
 import PromiseKit
 import SwiftyBeaver
@@ -410,20 +409,6 @@ extension DispatchWorkItem: Equatable {
 }
 
 extension DispatchWorkItem: Hashable {
-    public var hashValue: Int {
-        // Use the instance's unique identifier for hashing
-        return ObjectIdentifier(self).hashValue
-    }
-}
-
-extension Request: Equatable {
-    public static func ==(lhs: Request, rhs: Request) -> Bool {
-        // Compare the instances
-        return lhs === rhs
-    }
-}
-
-extension Request: Hashable {
     public var hashValue: Int {
         // Use the instance's unique identifier for hashing
         return ObjectIdentifier(self).hashValue

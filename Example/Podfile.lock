@@ -1,63 +1,35 @@
 PODS:
-  - Alamofire (4.7.2)
-  - CancelForPromiseKit (1.0.0):
-    - CancelForPromiseKit/CorePromise (= 1.0.0)
-    - CancelForPromiseKit/Foundation (= 1.0.0)
-  - CancelForPromiseKit/Alamofire (1.0.0):
-    - Alamofire (~> 4.0)
-    - CancelForPromiseKit/CorePromise
-    - PromiseKit/Alamofire (~> 6.0)
-  - CancelForPromiseKit/CorePromise (1.0.0):
-    - PromiseKit/CorePromise (~> 6.0)
-  - CancelForPromiseKit/Foundation (1.0.0):
-    - CancelForPromiseKit/CorePromise
-    - PromiseKit/Foundation (~> 6.0)
-  - PromiseKit (6.3.4):
-    - PromiseKit/CorePromise (= 6.3.4)
-    - PromiseKit/Foundation (= 6.3.4)
-    - PromiseKit/UIKit (= 6.3.4)
-  - PromiseKit/Alamofire (6.3.4):
-    - Alamofire (~> 4.0)
-    - PromiseKit/CorePromise
-  - PromiseKit/CorePromise (6.3.4)
-  - PromiseKit/Foundation (6.3.4):
-    - PromiseKit/CorePromise
+  - PromiseKit/CorePromise (6.5.0)
   - SearchBox (1.0.0):
-    - Alamofire (~> 4.6)
-    - CancelForPromiseKit (~> 1.0)
-    - CancelForPromiseKit/Alamofire (~> 1.0)
-    - PromiseKit (~> 6.0)
-    - PromiseKit/Alamofire (~> 6.0)
+    - PromiseKit/CorePromise (~> 6.5)
     - SwiftyBeaver (~> 1.5)
-  - SwiftyBeaver (1.6.0)
+  - SwiftyBeaver (1.6.1)
 
 DEPENDENCIES:
-  - Alamofire (~> 4.0)
-  - CancelForPromiseKit/Alamofire (~> 1.0)
-  - CancelForPromiseKit/CorePromise (~> 1.0)
-  - PromiseKit (~> 6.0)
-  - PromiseKit/Alamofire (~> 6.0)
+  - PromiseKit/CorePromise (from `https://github.com/dougzilla32/PromiseKitCoreCancel`)
   - SearchBox (from `../`)
   - SwiftyBeaver (~> 1.5)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
-    - Alamofire
-    - CancelForPromiseKit
-    - PromiseKit
+  https://github.com/cocoapods/specs.git:
     - SwiftyBeaver
 
 EXTERNAL SOURCES:
+  PromiseKit:
+    :git: https://github.com/dougzilla32/PromiseKitCoreCancel
   SearchBox:
     :path: "../"
 
+CHECKOUT OPTIONS:
+  PromiseKit:
+    :commit: 16daa6caf1df07dc6ce05166bd3d38287e4b71b4
+    :git: https://github.com/dougzilla32/PromiseKitCoreCancel
+
 SPEC CHECKSUMS:
-  Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
-  CancelForPromiseKit: d4416fa466a87572489f6ec24b3bab50ebc0d891
-  PromiseKit: e1425568123ec844a944c93f2bcb29d511d39cf5
-  SearchBox: f29af60babb593e15f16f942243446ca6c47684d
-  SwiftyBeaver: e45759613e50b522b0e6f53b1f0f14389b45ca34
+  PromiseKit: cc0627c4441dea85713ab6b79550a275e637b98f
+  SearchBox: c1b5d0e740cd6d750674c80b99789880065edc20
+  SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
 
-PODFILE CHECKSUM: d466d3f34f534632ff439cc9f59c59878f0d363b
+PODFILE CHECKSUM: 442d629cb11c18484bad66973908dc2660f79d30
 
-COCOAPODS: 1.5.0
+COCOAPODS: 1.5.3

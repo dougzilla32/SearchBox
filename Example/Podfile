@@ -4,16 +4,11 @@ use_frameworks!
 target 'SearchBox_Example' do
     pod 'SearchBox', :path => '../'
 
-    pod 'Alamofire', '~> 4.0'
-    pod 'PromiseKit', '~> 6.0'
-    pod 'PromiseKit/Alamofire', '~> 6.0'
-    pod 'CancelForPromiseKit/CorePromise', '~> 1.0'
-    pod 'CancelForPromiseKit/Alamofire', '~> 1.0'
+    pod 'PromiseKit/CorePromise', :git => 'https://github.com/dougzilla32/PromiseKitCoreCancel'
+#    pod 'PromiseKit/CorePromise', '~> 7.0'
     pod 'SwiftyBeaver', '~> 1.5'
 
   target 'SearchBox_Tests' do
     inherit! :search_paths
-
-    
   end
 end
