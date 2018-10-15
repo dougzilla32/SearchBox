@@ -8,7 +8,6 @@
 import Alamofire
 import Cocoa
 import PromiseKit
-import CancelForPromiseKit
 import SwiftyBeaver
 
 @IBDesignable
@@ -179,12 +178,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
                 }
             }
-            return CancellablePromise.valueCC(suggestions)
+            return cancellable(Promise.value(suggestions))
         }
         
-        return afterCC(seconds: 0.2).then {
+        return cancellable(after(seconds: 0.2)).then {
             searchDelegate.completions(for: self.stringValue)
-        }.map { cities -> [[String: Any]] in
+        }.map { items -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
@@ -193,9 +192,9 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     alreadyUsed.insert("\(item.name)|\(item.detail)")
                 }
             }
-            for city in cities {
-                if !alreadyUsed.contains("\(city.0)|\(city.1)") {
-                    suggestions.append([kSuggestionLabel: city.0, kSuggestionDetailedLabel: city.1])
+            for item in items {
+                if !alreadyUsed.contains("\(item.0)|\(item.1)") {
+                    suggestions.append([kSuggestionLabel: item.0, kSuggestionDetailedLabel: item.1])
                 }
             }
             return suggestions
@@ -310,22 +309,22 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     /* In interface builder, we set this class object as the delegate for the search text field. When the user starts editing the text field, this method is called. This is an opportune time to display the initial suggestions.
      */
-    override public func controlTextDidBeginEditing(_ notification: Notification?) {
+    override public func controlTextDidBeginEditing(_ notification: Notification) {
         if !skipNextSuggestion {
             if suggestionsController == nil {
                 suggestionsController = SuggestionsWindowController()
                 suggestionsController?.target = self
                 suggestionsController?.action = #selector(SearchBox.update(withSelectedSuggestion:))
             }
-            updateSuggestions(from: notification?.object as? NSControl)
+            updateSuggestions(from: notification.object as? NSControl)
         }
     }
     
     /* The field editor's text may have changed for a number of reasons. Generally, we should update the suggestions window with the new suggestions. However, in some cases (the user deletes characters) we cancel the suggestions window.
      */
-    override public func controlTextDidChange(_ notification: Notification?) {
+    override public func controlTextDidChange(_ notification: Notification) {
         if !skipNextSuggestion {
-            updateSuggestions(from: notification?.object as? NSControl)
+            updateSuggestions(from: notification.object as? NSControl)
         } else {
             // If we are skipping this suggestion, then cancel the suggestions window.
             // If the suggestionController is already in a cancelled state, this call does nothing and is therefore always safe to call.
@@ -338,7 +337,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     /* The field editor has ended editing the text. This is not the same as the action from the NSTextField. In the MainMenu.xib, the search text field is setup to only send its action on return / enter. If the user tabs to or clicks on another control, text editing will end and this method is called. We don't consider this committal of the action. Instead, we realy on the text field's action to commit
      the suggestion. However, since the action may not occur, we need to cancel the suggestions window here.
      */
-    override public func controlTextDidEndEditing(_ obj: Notification?) {
+    override public func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsController?.cancelSuggestions()
     }
     

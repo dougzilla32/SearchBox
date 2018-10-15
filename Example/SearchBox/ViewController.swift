@@ -10,9 +10,36 @@ import Cocoa
 import SearchBox
 import Alamofire
 import PromiseKit
-import CancelForPromiseKit
 
-class ViewController: NSViewController, SearchBoxDelegate {
+class ViewController: NSViewController, NSWindowDelegate, SearchBoxDelegate {
+    @IBOutlet weak var searchBox: SearchBox!
+    
+    @IBAction func searchMe(_ sender: Any) {
+        print("searchMe: \(searchBox.stringValue) \(searchBox.detailValue)")
+    }
+    
+    // MARK: NSViewController
+    
+    override func viewDidAppear() {
+        self.view.window?.delegate = self
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        searchBox.searchBoxDelegate = self
+        searchBox.searchHistoryCount = 10
+    }
+    
+    // MARK: NSWindowDelegate
+    
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        NSApplication.shared.terminate(self)
+        return true
+    }
+    
+    // MARK: SearchBoxDelegate
+
     func completions(for text: String) -> CancellablePromise<[(String, String)]> {
         var completions = [(String, String)]()
         if let spellCompletions = NSSpellChecker.shared.completions(forPartialWordRange: NSMakeRange(0, text.count), in: text, language: nil, inSpellDocumentWithTag: 0) {
@@ -20,25 +47,6 @@ class ViewController: NSViewController, SearchBoxDelegate {
                 completions.append((s, "us"))
             }
         }
-        return CancellablePromise.valueCC(completions)
-    }
-    
-    @IBAction func searchMe(_ sender: Any) {
-        print("searchMe: \(searchBox.stringValue) \(searchBox.detailValue)")
-    }
-    
-    @IBOutlet weak var searchBox: SearchBox!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        searchBox.searchBoxDelegate = self        
-        searchBox.searchHistoryCount = 10
-    }
-    
-    override var representedObject: Any? {
-        didSet {
-            // Update the view, if already loaded.
-        }
+        return cancellable(Promise.value(completions))
     }
 }

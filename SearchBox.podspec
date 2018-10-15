@@ -45,9 +45,7 @@ https://developer.apple.com/library/content/samplecode/CustomMenus
   # s.frameworks = 'Cocoa'
   
   s.dependency 'Alamofire', '~> 4.6'
-  s.dependency 'PromiseKit/CorePromise', '~> 6.0'
-  s.dependency 'PromiseKit/Alamofire', '~> 6.0'
-  s.dependency 'CancelForPromiseKit/CorePromise', '~> 1.0'
-  s.dependency 'CancelForPromiseKit/Alamofire', '~> 1.0'
+  s.dependency 'PromiseKit/CorePromise', '~> 7.0'
+  s.dependency 'PromiseKit/Alamofire', '~> 7.0'
   s.dependency 'SwiftyBeaver', '~> 1.5'
 end

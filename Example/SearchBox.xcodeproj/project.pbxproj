@@ -90,7 +90,7 @@
 		ED83F66F20348A760038D96B = {
 			isa = PBXGroup;
 			children = (
-				ED83F69A20348B650038D96B /* Podspec Metadata */,
+				ED83F69A20348B650038D96B /* Config */,
 				ED83F67A20348A760038D96B /* SearchBox */,
 				ED83F68D20348A760038D96B /* Tests */,
 				ED83F67920348A760038D96B /* Products */,
@@ -130,13 +130,13 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		ED83F69A20348B650038D96B /* Podspec Metadata */ = {
+		ED83F69A20348B650038D96B /* Config */ = {
 			isa = PBXGroup;
 			children = (
 				6C4C6B49CCF1E89BAF04170D /* SearchBox.podspec */,
 				567BB2F44665718DDDA91869 /* LICENSE */,
 			);
-			name = "Podspec Metadata";
+			name = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -266,7 +266,6 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-SearchBox_Example/Pods-SearchBox_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/CancelForPromiseKit/CancelForPromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/SearchBox/SearchBox.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
@@ -274,7 +273,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CancelForPromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SearchBox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
