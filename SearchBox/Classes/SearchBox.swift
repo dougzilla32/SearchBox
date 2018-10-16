@@ -233,7 +233,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 // No suggestions. Cancel the suggestion window.
                 self.cancelSuggestions()
             }
-        }.catch(policy: .allErrorsExceptCancellation) { error in
+        }.catch { error in
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
         }.cancelContext
@@ -266,7 +266,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         self.window?.makeFirstResponder(nil)
     }
     
-    func revertEditing() {
+    public func revertEditing() {
         super.stringValue = mostRecentSearch ?? ""
         cancelEditing()
     }
