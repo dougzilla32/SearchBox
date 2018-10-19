@@ -180,9 +180,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             return cancellable(Promise.value(suggestions))
         }
         
-        return cancellable(after(seconds: 0.2)).then {
-            searchDelegate.completions(for: self.stringValue)
-        }.map { items -> [[String: Any]] in
+        return searchDelegate.completions(for: self.stringValue).map { items -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
