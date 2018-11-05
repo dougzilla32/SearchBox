@@ -67,7 +67,7 @@ public class SearchHistoryItem {
     var next: SearchHistoryItem?
     public var name: String
     public var detail: String
-    public var cachedData: Any?
+    public var any: Any?
     public var timestamp: Date
     
     init(name: String, detail: String) {
