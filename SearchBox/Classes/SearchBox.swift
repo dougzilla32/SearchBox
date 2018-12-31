@@ -184,7 +184,8 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
-                for item in self.searchHistory! where item.name.starts(with: self.stringValue) {
+                let lowercasedStringValue = self.stringValue.lowercased()
+                for item in self.searchHistory! where item.name.lowercased().starts(with: lowercasedStringValue) {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
                     alreadyUsed.insert("\(item.name)|\(item.detail)")
                 }
