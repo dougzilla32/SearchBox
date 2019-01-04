@@ -257,6 +257,20 @@ class SuggestionsWindowController: NSWindowController {
         return trackingArea
     }
 
+    class FavoriteObserver: NSObject {
+        let parentTextField: SearchBox
+        
+        init(parentTextField: SearchBox) { self.parentTextField = parentTextField }
+        
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+            if let e = object as? Dictionary<String, Any> {
+                parentTextField.favoriteUpdated(label: e[kSuggestionLabel] as! String, detailedLabel: e[kSuggestionDetailedLabel] as! String, favorite: e[kSuggestionFavorite] as! Bool)
+            }
+        }
+    }
+    
+    private var favoriteObservers: [(NSMutableDictionary, FavoriteObserver)] = []
+    
     // Creates suggestion views from suggestionprototype.xib for every suggestion and resize the suggestion window accordingly. Also creates a thumbnail image on a backgroung aue.
     private func layoutSuggestions() {
         let window: NSWindow? = self.window
@@ -273,6 +287,10 @@ class SuggestionsWindowController: NSWindowController {
             }
         }
         trackingAreas.removeAll()
+        for observer in favoriteObservers {
+            observer.0.removeObserver(observer.1, forKeyPath: kSuggestionFavorite, context: nil)
+        }
+        favoriteObservers.removeAll()
 
         /* Iterate througn each suggestion creating a view for each entry.
          */
@@ -306,22 +324,12 @@ class SuggestionsWindowController: NSWindowController {
             let mutableEntry = (entry as NSDictionary).mutableCopy() as! NSMutableDictionary
             viewController.representedObject = mutableEntry
             
-            class FavoriteObserver: NSObject {
-                let parentTextField: SearchBox
-
-                init(parentTextField: SearchBox) { self.parentTextField = parentTextField }
-
-                override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-                    if let e = object as? Dictionary<String, Any> {
-                        parentTextField.searchBoxDelegate?.favoriteUpdated(label: e[kSuggestionLabel] as! String, detailedLabel: e[kSuggestionDetailedLabel] as! String, favorite: e[kSuggestionFavorite] as! Bool)
-                    }
-                }
-            }
-            
+            // set up favorite observer
             if let parentTextField = self.parentTextField {
                 let observer = FavoriteObserver(parentTextField: parentTextField)
                 mutableEntry[kSuggestionObserver] = observer
                 mutableEntry.addObserver(observer, forKeyPath: kSuggestionFavorite, options: .new, context: nil)
+                favoriteObservers.append((mutableEntry, observer))
             }
             
             viewControllers.append(viewController)
@@ -374,9 +382,10 @@ class SuggestionsWindowController: NSWindowController {
      */
     override func mouseUp(with theEvent: NSEvent) {
         if let selectedSuggestion = selectedSuggestion() {
-            parentTextField?.stringValue = selectedSuggestion[kSuggestionLabel] as! String
-            parentTextField?.detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
-            parentTextField?.favoriteValue = selectedSuggestion[kSuggestionFavorite] as! Bool
+            parentTextField?.value =
+                (name: selectedSuggestion[kSuggestionLabel] as! String,
+                 detail: selectedSuggestion[kSuggestionDetailedLabel] as! String,
+                 favorite: selectedSuggestion[kSuggestionFavorite] as! Bool)
         }
         parentTextField?.validateEditing()
         parentTextField?.abortEditing()

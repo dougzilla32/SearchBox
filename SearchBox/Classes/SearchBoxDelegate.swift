@@ -10,5 +10,5 @@ import PromiseKit
 public protocol SearchBoxDelegate {
     func completions(for text: String) -> CancellablePromise<[(String,String,Bool)]>
     
-    func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool)
+    func favoriteUpdated(name: String, detail: String, favorite: Bool)
 }

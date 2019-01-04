@@ -39,19 +39,28 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    private var mostRecentSearch: String?
-
-    override open var stringValue: String {
+    var value: (name: String, detail: String, favorite: Bool) {
         get {
-            return super.stringValue
+            return (name: stringValue, detail: detailValue, favorite: favoriteValue)
         }
         
         set {
-            super.stringValue = newValue
-            mostRecentSearch = newValue
-            searchHistory?.add(name: newValue, detail: detailValue, favorite: favoriteValue)
+            stringValue = newValue.name
+            nameValue = newValue.name
+            detailValue = newValue.detail
+            favoriteValue = newValue.favorite
+            searchHistory?.add(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
         }
     }
+    
+    // The most recently searched name
+    private var nameValue = ""
+    
+    // The most recently selected detail from the suggestions window
+    private var detailValue = ""
+
+    // The most recently selected favorite from the suggestions window
+    private var favoriteValue = false
     
     public internal(set) var searchHistory: SearchHistory?
     
@@ -60,13 +69,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     // Used to hide the cancel button when the search field does not have the focus.
     private var cancelButtonCell: NSButtonCell?
-    
-    // The most recently selected detail from the suggestions window
-    public internal(set) var detailValue = ""
-    
-    // The most recently selected favorite from the suggestions window
-    public internal(set) var favoriteValue = false
-    
+
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         setup()
@@ -241,6 +244,14 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }.cancelContext
     }
     
+    func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
+        searchHistory?.add(name: label, detail: detailedLabel, favorite: favorite)
+        if nameValue != "" {
+            searchHistory?.add(name: nameValue, detail: detailValue, favorite: favoriteValue)
+        }
+        searchBoxDelegate?.favoriteUpdated(name: label, detail: detailedLabel, favorite: favorite)
+    }
+    
     /* Update the field editor with a suggested string. The additional suggested characters are auto selected.
      */
     private func updateFieldEditor(_ fieldEditor: NSText?, withSuggestion suggestion: String?) {
@@ -269,7 +280,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     public func revertEditing() {
-        super.stringValue = mostRecentSearch ?? ""
+        super.stringValue = nameValue
         cancelEditing()
     }
     
@@ -277,10 +288,10 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         cancelEditing()
 
         if self.stringValue != "" {
-            mostRecentSearch = self.stringValue
+            value = (name: self.stringValue, detail: detailValue, favorite: favoriteValue)
             sendAction(action, to: target)
-        } else if mostRecentSearch != nil {
-            super.stringValue = mostRecentSearch!
+        } else if nameValue != "" {
+            super.stringValue = nameValue
         }
     }
     
@@ -354,6 +365,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             // Giving up the focus will cause 'controlTextDidEndEditing' to be called
             if let selectedSuggestion = suggestionsController?.selectedSuggestion() {
                 super.stringValue = selectedSuggestion[kSuggestionLabel] as! String
+                nameValue = selectedSuggestion[kSuggestionLabel] as! String
                 detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
                 favoriteValue = selectedSuggestion[kSuggestionFavorite] as! Bool
             } else {
