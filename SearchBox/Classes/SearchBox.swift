@@ -49,7 +49,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         set {
             super.stringValue = newValue
             mostRecentSearch = newValue
-            searchHistory?.add(name: newValue, detail: detailValue)
+            searchHistory?.add(name: newValue, detail: detailValue, favorite: favoriteValue)
         }
     }
     
@@ -63,6 +63,9 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     // The most recently selected detail from the suggestions window
     public internal(set) var detailValue = ""
+    
+    // The most recently selected favorite from the suggestions window
+    public internal(set) var favoriteValue = false
     
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -174,7 +177,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             var suggestions = [[String: Any]]()
             if searchHistory != nil {
                 for item in searchHistory! {
-                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
+                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
                 }
             }
             return cancellable(Promise.value(suggestions))
@@ -186,13 +189,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             if self.searchHistory != nil {
                 let lowercasedStringValue = self.stringValue.lowercased()
                 for item in self.searchHistory! where item.name.lowercased().starts(with: lowercasedStringValue) {
-                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail])
-                    alreadyUsed.insert("\(item.name)|\(item.detail)")
+                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
+                    alreadyUsed.insert("\(item.name)|\(item.detail)|\(item.favorite)")
                 }
             }
             for item in items {
-                if !alreadyUsed.contains("\(item.0)|\(item.1)") {
-                    suggestions.append([kSuggestionLabel: item.0, kSuggestionDetailedLabel: item.1])
+                if !alreadyUsed.contains("\(item.0)|\(item.1)|\(item.2)") {
+                    suggestions.append([kSuggestionLabel: item.0, kSuggestionDetailedLabel: item.1, kSuggestionFavorite: item.2])
                 }
             }
             return suggestions
@@ -352,8 +355,10 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             if let selectedSuggestion = suggestionsController?.selectedSuggestion() {
                 super.stringValue = selectedSuggestion[kSuggestionLabel] as! String
                 detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
+                favoriteValue = selectedSuggestion[kSuggestionFavorite] as! Bool
             } else {
                 detailValue = ""
+                favoriteValue = false
             }
             
             self.window?.makeFirstResponder(nil)

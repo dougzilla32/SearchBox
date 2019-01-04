@@ -49,6 +49,8 @@ let kSuggestionImage = "image"
 let kSuggestionImageURL = "imageUrl"
 let kSuggestionLabel = "label"
 let kSuggestionDetailedLabel = "detailedLabel"
+let kSuggestionFavorite = "favorite"
+let kSuggestionObserver = "observer"
 
 class SuggestionsWindowController: NSWindowController {
     var action: Selector?
@@ -60,6 +62,9 @@ class SuggestionsWindowController: NSWindowController {
     private var needsLayoutUpdate = false
     private var localMouseDownEventMonitor: Any?
     private var lostFocusObserver: Any?
+    
+    private var favoriteImage = NSImage(named: NSImage.Name(rawValue: "Heart"))
+    private var favoriteOutlineImage = NSImage(named: NSImage.Name(rawValue: "Heart outline"))
 
     init() {
         let contentRec = NSRect(x: 0, y: 0, width: 20, height: 20)
@@ -112,14 +117,14 @@ class SuggestionsWindowController: NSWindowController {
         // nudge the suggestion window down so it doesn't overlapp the parent view
         suggestionWindow?.setFrame(frame ?? NSRect.zero, display: false)
         suggestionWindow?.setFrameTopLeftPoint(location ?? NSPoint.zero)
+        // keep track of the parent text field in case we need to commit or abort editing.
+        self.parentTextField = parentTextField
         layoutSuggestions()
         // The height of the window will be adjusted in -layoutSuggestions.
         // add the suggestion window as a child window so that it plays nice with Expose
         if let aWindow = suggestionWindow {
             parentWindow?.addChildWindow(aWindow, ordered: .above)
         }
-        // keep track of the parent text field in case we need to commit or abort editing.
-        self.parentTextField = parentTextField
         // The window must know its accessibility parent, the control must know the window one of its accessibility children
         // Note that views (controls especially) are often ignored, so we want the unignored descendant - usually a cell
         // Finally, post that we have created the unignored decendant of the suggestions window
@@ -298,15 +303,34 @@ class SuggestionsWindowController: NSWindowController {
                 contentView?.addTrackingArea(anArea)
             }
             // convert the suggestion enty to a mutable dictionary. This dictionary is bound to the view controller's representedObject. The represented object is what all the subviews are bound to in IB. We must use a mutable dictionary because we may change one of its key values.
-            var mutableEntry = entry
+            let mutableEntry = (entry as NSDictionary).mutableCopy() as! NSMutableDictionary
             viewController.representedObject = mutableEntry
+            
+            class FavoriteObserver: NSObject {
+                let parentTextField: SearchBox
+
+                init(parentTextField: SearchBox) { self.parentTextField = parentTextField }
+
+                override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+                    if let e = object as? Dictionary<String, Any> {
+                        parentTextField.searchBoxDelegate?.favoriteUpdated(label: e[kSuggestionLabel] as! String, detailedLabel: e[kSuggestionDetailedLabel] as! String, favorite: e[kSuggestionFavorite] as! Bool)
+                    }
+                }
+            }
+            
+            if let parentTextField = self.parentTextField {
+                let observer = FavoriteObserver(parentTextField: parentTextField)
+                mutableEntry[kSuggestionObserver] = observer
+                mutableEntry.addObserver(observer, forKeyPath: kSuggestionFavorite, options: .new, context: nil)
+            }
+            
             viewControllers.append(viewController)
             if let anArea = trackingArea {
                 trackingAreas.append(anArea)
             }
             /* If the suggestion entry does not contain an NSImage (and never does in this sample code), then create a thumbnail from the fileURL on a background que
              */
-            if mutableEntry[kSuggestionImage] == nil {
+            if mutableEntry[kSuggestionImage] == nil && mutableEntry[kSuggestionImageURL] != nil {
                 // Load the image in an operation block so that the window pops up immediatly
                 ITESharedOperationQueue()?.addOperation({(_: Void) -> Void in
                     if let fileURL = mutableEntry[kSuggestionImageURL] as? URL,
@@ -352,6 +376,7 @@ class SuggestionsWindowController: NSWindowController {
         if let selectedSuggestion = selectedSuggestion() {
             parentTextField?.stringValue = selectedSuggestion[kSuggestionLabel] as! String
             parentTextField?.detailValue = selectedSuggestion[kSuggestionDetailedLabel] as! String
+            parentTextField?.favoriteValue = selectedSuggestion[kSuggestionFavorite] as! Bool
         }
         parentTextField?.validateEditing()
         parentTextField?.abortEditing()

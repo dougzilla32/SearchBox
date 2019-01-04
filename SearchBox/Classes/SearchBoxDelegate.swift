@@ -8,5 +8,7 @@
 import PromiseKit
 
 public protocol SearchBoxDelegate {
-    func completions(for text: String) -> CancellablePromise<[(String,String)]>
+    func completions(for text: String) -> CancellablePromise<[(String,String,Bool)]>
+    
+    func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool)
 }

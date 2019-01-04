@@ -14,20 +14,20 @@ public class SearchHistory: Sequence {
     public internal(set) var map = [String: SearchHistoryItem]()
 
     init(limit: Int) {
-        first = SearchHistoryItem(name: "", detail: "")
+        first = SearchHistoryItem(name: "", detail: "", favorite: false)
         last = first
         self.limit = Swift.max(limit, 2)
     }
     
-    public func add(name: String, detail: String) {
+    public func add(name: String, detail: String, favorite: Bool) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
-            if item.name == last.name {
+            if item === last {
                 last = last.prev!
             }
             item.remove()
         } else {
-            item = SearchHistoryItem(name: name, detail: detail)
+            item = SearchHistoryItem(name: name, detail: detail, favorite: favorite)
             map[name] = item
             if map.count > limit {
                 let item = first.next!
@@ -67,12 +67,14 @@ public class SearchHistoryItem {
     var next: SearchHistoryItem?
     public var name: String
     public var detail: String
+    public var favorite: Bool
     public var any: Any?
     public var timestamp: Date
     
-    init(name: String, detail: String) {
+    init(name: String, detail: String, favorite: Bool) {
         self.name = name
         self.detail = detail
+        self.favorite = favorite
         timestamp = Date()
     }
     
