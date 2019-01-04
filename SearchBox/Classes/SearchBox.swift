@@ -39,7 +39,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    var value: (name: String, detail: String, favorite: Bool) {
+    public var searchValue: (name: String, detail: String, favorite: Bool) {
         get {
             return (name: stringValue, detail: detailValue, favorite: favoriteValue)
         }
@@ -51,6 +51,19 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             favoriteValue = newValue.favorite
             searchHistory?.add(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
         }
+    }
+    
+    public func updateName(oldName: String, newName: String) {
+        if nameValue == oldName {
+            stringValue = newName
+            nameValue = newName
+            if let item = searchHistory?.map[oldName] {
+                detailValue = item.detail
+                favoriteValue = item.favorite
+            }
+        }
+        
+        searchHistory?.rename(oldName: oldName, newName: newName)
     }
     
     // The most recently searched name
@@ -247,7 +260,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
         searchHistory?.add(name: label, detail: detailedLabel, favorite: favorite)
         if nameValue != "" {
-            searchHistory?.add(name: nameValue, detail: detailValue, favorite: favoriteValue)
+            if nameValue == label {
+                detailValue = detailedLabel
+                favoriteValue = favorite
+            } else {
+                searchHistory?.add(name: nameValue, detail: detailValue, favorite: favoriteValue)
+            }
         }
         searchBoxDelegate?.favoriteUpdated(name: label, detail: detailedLabel, favorite: favorite)
     }
@@ -288,7 +306,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         cancelEditing()
 
         if self.stringValue != "" {
-            value = (name: self.stringValue, detail: detailValue, favorite: favoriteValue)
+            searchValue = (name: self.stringValue, detail: detailValue, favorite: favoriteValue)
             sendAction(action, to: target)
         } else if nameValue != "" {
             super.stringValue = nameValue

@@ -46,16 +46,17 @@ public class SearchHistory: Sequence {
         } else {
             item = SearchHistoryItem(name: name, detail: detail, favorite: favorite)
             map[name] = item
-            if !favorite && (map.count - favoriteCount) > limit {
-                let item = first.next!
-                map[item.name] = nil
-                item.remove()
-            }
             if favorite {
                 favoriteCount += 1
             }
         }
         
+        if !favorite && (map.count - favoriteCount) > limit {
+            let del = first.next!
+            map[del.name] = nil
+            del.remove()
+        }
+
         if favorite {
             // Insert favorite items alphabetically
             var cur: SearchHistoryItem! = first.next
@@ -76,6 +77,27 @@ public class SearchHistory: Sequence {
             }
             lastNonFavorite.insertAfter(item: item)
             lastNonFavorite = item
+        }
+    }
+    
+    public func rename(oldName: String, newName: String) {
+        guard oldName != newName else {
+            return
+        }
+        if let item = map[oldName] {
+            if let dupItem = map[newName] {
+                dupItem.remove()
+            }
+            if item.favorite {
+                // re-insert to sort properly
+                item.remove()
+                item.name = newName
+                add(name: item.name, detail: item.detail, favorite: item.favorite)
+            } else {
+                map.removeValue(forKey: oldName)
+                map[newName] = item
+                item.name = newName
+            }
         }
     }
     

@@ -382,7 +382,7 @@ class SuggestionsWindowController: NSWindowController {
      */
     override func mouseUp(with theEvent: NSEvent) {
         if let selectedSuggestion = selectedSuggestion() {
-            parentTextField?.value =
+            parentTextField?.searchValue =
                 (name: selectedSuggestion[kSuggestionLabel] as! String,
                  detail: selectedSuggestion[kSuggestionDetailedLabel] as! String,
                  favorite: selectedSuggestion[kSuggestionFavorite] as! Bool)
