@@ -39,6 +39,17 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
+    public var searchName: String {
+        get {
+            return nameValue
+        }
+        
+        set {
+            let historyItem = searchHistory?.map[newValue]
+            searchValue = (name: newValue, detail: historyItem?.detail ?? "", favorite: historyItem?.favorite ?? false)
+        }
+    }
+    
     public var searchValue: (name: String, detail: String, favorite: Bool) {
         get {
             return (name: stringValue, detail: detailValue, favorite: favoriteValue)
@@ -49,7 +60,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             nameValue = newValue.name
             detailValue = newValue.detail
             favoriteValue = newValue.favorite
-            searchHistory?.add(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
+            searchHistory?.insert(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
         }
     }
     
@@ -258,13 +269,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
-        searchHistory?.add(name: label, detail: detailedLabel, favorite: favorite)
+        searchHistory?.insert(name: label, detail: detailedLabel, favorite: favorite)
         if nameValue != "" {
             if nameValue == label {
                 detailValue = detailedLabel
                 favoriteValue = favorite
             } else {
-                searchHistory?.add(name: nameValue, detail: detailValue, favorite: favoriteValue)
+                searchHistory?.insert(name: nameValue, detail: detailValue, favorite: favoriteValue)
             }
         }
         searchBoxDelegate?.favoriteUpdated(name: label, detail: detailedLabel, favorite: favorite)

@@ -10,28 +10,102 @@ import Foundation
 public class SearchHistory: Sequence {
     private var first: SearchHistoryItem
     private var last: SearchHistoryItem
-    private var lastNonFavorite: SearchHistoryItem
     public internal(set) var limit: Int
     public internal(set) var map = [String: SearchHistoryItem]()
     private var favoriteCount = 0
-
-    init(limit: Int) {
-        first = SearchHistoryItem(name: "", detail: "", favorite: false)
-        last = first
-        lastNonFavorite = first
-        self.limit = Swift.max(limit, 2)
+    
+    private var comparator: (SearchHistoryItem, SearchHistoryItem) -> Bool {
+        didSet {
+            resort()
+        }
     }
     
-    public func add(name: String, detail: String, favorite: Bool) {
+    static func nameComparator(item1: SearchHistoryItem, item2: SearchHistoryItem) -> Bool {
+        if item1.favorite != item2.favorite {
+            return item1.favorite && !item2.favorite
+        }
+        return item1.name < item2.name
+    }
+
+    static func countryComparator(item1: SearchHistoryItem, item2: SearchHistoryItem) -> Bool {
+        if item1.favorite != item2.favorite {
+            return item1.favorite && !item2.favorite
+        }
+        if item1.detail != item2.detail {
+            if item1.detail == "US" { return true }
+            if item2.detail == "US" { return false }
+            return item1.detail < item2.detail
+        }
+        return item1.name < item2.name
+    }
+    
+    static func distanceComparator(item1: SearchHistoryItem, item2: SearchHistoryItem) -> Bool {
+        if item1.favorite != item2.favorite {
+            return item1.favorite && !item2.favorite
+        }
+        // TODO: compute distance from current location
+        return item1.name < item2.name
+    }
+    
+   init(limit: Int) {
+        first = SearchHistoryItem(name: "", detail: "", favorite: false)
+        last = first
+        self.limit = Swift.max(limit, 2)
+        
+        comparator = SearchHistory.nameComparator
+    }
+    
+    public func resort() {
+        var arr: [SearchHistoryItem] = []
+        var item: SearchHistoryItem! = first.next
+        while item != nil {
+            arr.append(item)
+            item = item.next
+        }
+        arr.sort(by: comparator)
+        arr.reverse()
+        
+        var prev = first
+        for item in arr {
+            prev.next = item
+            item.prev = prev
+            item.next = nil
+            prev = item
+        }
+    }
+    
+    public func append(name: String, detail: String, favorite: Bool) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
+            // update existing item, leave it in the same place in the list
+            item.detail = detail
+            if item.favorite != favorite {
+                if favorite {
+                    favoriteCount += 1
+                } else {
+                    favoriteCount -= 1
+                }
+            }
+            item.favorite = favorite
+        } else {
+            // add new item
+            item = SearchHistoryItem(name: name, detail: detail, favorite: favorite)
+            map[name] = item
+            if favorite {
+                favoriteCount += 1
+            }
+            last.insertAfter(item: item)
+            last = item
+        }
+    }
+    
+    public func insert(name: String, detail: String, favorite: Bool) {
+        var item: SearchHistoryItem! = map[name]
+        if item != nil {
+            // update existing item, remove from list and re-insert
             if item === last {
                 last = last.prev!
             }
-            if item === lastNonFavorite {
-                lastNonFavorite = lastNonFavorite.prev!
-            }
-            
             item.remove()
             item.detail = detail
             
@@ -44,6 +118,7 @@ public class SearchHistory: Sequence {
             }
             item.favorite = favorite
         } else {
+            // add new item
             item = SearchHistoryItem(name: name, detail: detail, favorite: favorite)
             map[name] = item
             if favorite {
@@ -51,32 +126,25 @@ public class SearchHistory: Sequence {
             }
         }
         
+        // enforce limit on recent searches
         if !favorite && (map.count - favoriteCount) > limit {
             let del = first.next!
             map[del.name] = nil
             del.remove()
         }
 
-        if favorite {
-            // Insert favorite items alphabetically
-            var cur: SearchHistoryItem! = first.next
-            while cur != nil {
-                if cur.favorite && (cur.detail < item.detail || (cur.detail == item.detail && cur.name < item.name)) {
-                    cur.prev!.insertAfter(item: item)
-                    break
-                }
-                cur = cur.next
+        // insert item into the list according to 'comparator'
+        var cur: SearchHistoryItem! = first.next
+        while cur != nil {
+            if comparator(cur, item) {
+                cur.prev!.insertAfter(item: item)
+                break
             }
-            if cur == nil {
-                last.insertAfter(item: item)
-                last = item
-            }
-        } else {
-            if last === lastNonFavorite {
-                last = item
-            }
-            lastNonFavorite.insertAfter(item: item)
-            lastNonFavorite = item
+            cur = cur.next
+        }
+        if cur == nil {
+            last.insertAfter(item: item)
+            last = item
         }
     }
     
@@ -88,29 +156,21 @@ public class SearchHistory: Sequence {
             if let dupItem = map[newName] {
                 dupItem.remove()
             }
-            if item.favorite {
-                // re-insert to sort properly
-                item.remove()
-                item.name = newName
-                add(name: item.name, detail: item.detail, favorite: item.favorite)
-            } else {
-                map.removeValue(forKey: oldName)
-                map[newName] = item
-                item.name = newName
-            }
+
+            // re-insert to sort properly
+            item.remove()
+            item.name = newName
+            insert(name: item.name, detail: item.detail, favorite: item.favorite)
         }
     }
     
     public func makeIterator() -> SearchHistory.SearchHistoryIterator {
-        return SearchHistoryIterator(item: last)
+        return SearchHistoryIterator(currentItem: last, firstItem: first)
     }
     
     public struct SearchHistoryIterator: IteratorProtocol {
         var currentItem: SearchHistoryItem
-        
-        init(item: SearchHistoryItem) {
-            currentItem = item
-        }
+        var firstItem: SearchHistoryItem
     
         public mutating func next() -> SearchHistoryItem? {
             var item: SearchHistoryItem? = nil
@@ -118,7 +178,7 @@ public class SearchHistory: Sequence {
                 item = currentItem
                 currentItem = prev
             }
-            return item
+            return (item === firstItem) ? nil : item
         }
     }
 }
