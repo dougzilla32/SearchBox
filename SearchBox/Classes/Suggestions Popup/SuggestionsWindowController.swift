@@ -62,6 +62,7 @@ class SuggestionsWindowController: NSWindowController {
     private var needsLayoutUpdate = false
     private var localMouseDownEventMonitor: Any?
     private var lostFocusObserver: Any?
+    private var cursorInsideView = false
     
     private var favoriteImage = NSImage(named: NSImage.Name(rawValue: "Heart"))
     private var favoriteOutlineImage = NSImage(named: NSImage.Name(rawValue: "Heart outline"))
@@ -270,13 +271,16 @@ class SuggestionsWindowController: NSWindowController {
     }
     
     private var favoriteObservers: [(NSMutableDictionary, FavoriteObserver)] = []
-    
+    private var favoritesLabel: NSTextView!
+    private var recentlyVisitedLabel: NSTextView!
+
     // Creates suggestion views from suggestionprototype.xib for every suggestion and resize the suggestion window accordingly. Also creates a thumbnail image on a backgroung aue.
     private func layoutSuggestions() {
         let window: NSWindow? = self.window
         let contentView = window?.contentView as? RoundedCornersView
         // Remove any existing suggestion view and associated tracking area and set the selection to nil
         selectedView = nil
+        cursorInsideView = false
         for viewController in viewControllers {
             viewController.view.removeFromSuperview()
         }
@@ -287,10 +291,15 @@ class SuggestionsWindowController: NSWindowController {
             }
         }
         trackingAreas.removeAll()
+        favoritesLabel?.removeFromSuperview()
+        recentlyVisitedLabel?.removeFromSuperview()
         for observer in favoriteObservers {
             observer.0.removeObserver(observer.1, forKeyPath: kSuggestionFavorite, context: nil)
         }
         favoriteObservers.removeAll()
+        
+        var hasFavoritesLabel = false
+        var hasRecentlyVisitedLabel = false
 
         /* Iterate througn each suggestion creating a view for each entry.
          */
@@ -302,6 +311,38 @@ class SuggestionsWindowController: NSWindowController {
         for entry: [String: Any] in suggestions {
             frame.origin.y += frame.size.height
 
+            var label: NSTextView!
+            if (entry[kSuggestionFavorite] as? Bool) ?? false {
+                if !hasFavoritesLabel {
+                    if favoritesLabel == nil {
+                        favoritesLabel = SuggestionsWindowController.createLabel("Favorites")
+                    }
+                    label = favoritesLabel
+                    hasFavoritesLabel = true
+                }
+            } else {
+                if !hasRecentlyVisitedLabel {
+                    frame.origin.y += 1
+                    if recentlyVisitedLabel == nil {
+                        recentlyVisitedLabel = SuggestionsWindowController.createLabel("Recently Visited")
+                    }
+                    label = recentlyVisitedLabel
+                    hasRecentlyVisitedLabel = true
+                }
+            }
+            
+            if label != nil {
+                frame.size.height = 22.0
+                label.frame = frame
+                // label.font = NSFont(name: label.font!.fontName, size: 8.0)
+                let fontManager = NSFontManager.shared
+                label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask,
+                    weight: 0, size: 11.0)
+                contentView?.addSubview(label)
+                frame.origin.y += frame.size.height
+
+            }
+            
             let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
             let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: frameworkBundle)
             let view = viewController.view as? HighlightingView
@@ -309,7 +350,7 @@ class SuggestionsWindowController: NSWindowController {
             if viewControllers.count == 0 {
                 selectedView = view
             }
-            // Use the height of set in IB of the prototype view as the heigt for the suggestion view.
+            // Use the height as set in IB of the prototype view as the heigt for the suggestion view.
             frame.size.height = (view?.frame.size.height)!
             view?.frame = frame
             if let aView = view {
@@ -359,6 +400,16 @@ class SuggestionsWindowController: NSWindowController {
         winFrame.size.height = contentFrame!.height
         window?.setFrame(winFrame, display: true)
     }
+    
+    static func createLabel(_ name: String) -> NSTextView {
+        let label = NSTextView()
+        label.string = name
+        label.backgroundColor = NSColor.disabledControlTextColor
+        label.isEditable = false
+        label.isSelectable = false
+        label.textContainerInset = NSSize(width: 0, height: 4)
+        return label
+    }
 
     /* The mouse is now over one of our child image views. Update selection and send action.
      */
@@ -366,8 +417,10 @@ class SuggestionsWindowController: NSWindowController {
         let view: NSView?
         if let userData = event.trackingArea?.userInfo as? [String: NSView] {
             view = userData[kTrackerKey]!
+            cursorInsideView = true
         } else {
             view = nil
+            cursorInsideView = false
         }
         userSetSelectedView(view)
     }
@@ -376,11 +429,15 @@ class SuggestionsWindowController: NSWindowController {
      */
     override func mouseExited(with event: NSEvent) {
         userSetSelectedView(nil)
+        cursorInsideView = false
     }
 
     /* The user released the mouse button. Force the parent text field to send its return action. Notice that there is no mouseDown: implementation. That is because the user may hold the mouse down and drag into another view.
      */
     override func mouseUp(with theEvent: NSEvent) {
+        guard cursorInsideView else {
+            return
+        }
         if let selectedSuggestion = selectedSuggestion() {
             parentTextField?.searchValue =
                 (name: selectedSuggestion[kSuggestionLabel] as! String,
