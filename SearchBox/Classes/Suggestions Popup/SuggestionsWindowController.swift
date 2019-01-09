@@ -319,35 +319,36 @@ class SuggestionsWindowController: NSWindowController {
         for entry: [String: Any] in suggestions {
             frame.origin.y += frame.size.height
 
-            var label: NSTextView!
-            if (entry[kSuggestionFavorite] as? Bool) ?? false {
-                if !hasFavoritesLabel {
-                    if favoritesLabel == nil {
-                        favoritesLabel = SuggestionsWindowController.createLabel("Favorites")
+            if parentTextField?.stringValue == "" {
+                var label: NSTextView!
+                if (entry[kSuggestionFavorite] as? Bool) ?? false {
+                    if !hasFavoritesLabel {
+                        if favoritesLabel == nil {
+                            favoritesLabel = SuggestionsWindowController.createLabel("Favorites")
+                        }
+                        label = favoritesLabel
+                        hasFavoritesLabel = true
                     }
-                    label = favoritesLabel
-                    hasFavoritesLabel = true
-                }
-            } else {
-                if !hasRecentlyVisitedLabel {
-                    if recentlyVisitedLabel == nil {
-                        recentlyVisitedLabel = SuggestionsWindowController.createLabel("Recently Visited")
+                } else {
+                    if !hasRecentlyVisitedLabel {
+                        if recentlyVisitedLabel == nil {
+                            recentlyVisitedLabel = SuggestionsWindowController.createLabel("Recently Visited")
+                        }
+                        label = recentlyVisitedLabel
+                        hasRecentlyVisitedLabel = true
                     }
-                    label = recentlyVisitedLabel
-                    hasRecentlyVisitedLabel = true
                 }
-            }
-            
-            if label != nil {
-                label.backgroundColor = headerColor
-                frame.size.height = 21.0
-                label.frame = frame
-                let fontManager = NSFontManager.shared
-                label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask,
-                    weight: 0, size: 11.0)
-                contentView?.addSubview(label)
-                frame.origin.y += frame.size.height
-
+                
+                if label != nil {
+                    label.backgroundColor = headerColor
+                    frame.size.height = 21.0
+                    label.frame = frame
+                    let fontManager = NSFontManager.shared
+                    label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask,
+                                                  weight: 0, size: 11.0)
+                    contentView?.addSubview(label)
+                    frame.origin.y += frame.size.height
+                }
             }
             
             let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
