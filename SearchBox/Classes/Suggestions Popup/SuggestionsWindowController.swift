@@ -273,6 +273,7 @@ class SuggestionsWindowController: NSWindowController {
     private var favoriteObservers: [(NSMutableDictionary, FavoriteObserver)] = []
     private var favoritesLabel: NSTextView!
     private var recentlyVisitedLabel: NSTextView!
+    private var headerColor: NSColor!
 
     // Creates suggestion views from suggestionprototype.xib for every suggestion and resize the suggestion window accordingly. Also creates a thumbnail image on a backgroung aue.
     private func layoutSuggestions() {
@@ -298,6 +299,13 @@ class SuggestionsWindowController: NSWindowController {
         }
         favoriteObservers.removeAll()
         
+        headerColor = NSColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.1)
+        if #available(OSX 10.14, *) {
+            if contentView?.effectiveAppearance.name == .darkAqua || contentView?.effectiveAppearance.name == .vibrantDark {
+                headerColor = NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.1)
+            }
+        }
+        
         var hasFavoritesLabel = false
         var hasRecentlyVisitedLabel = false
 
@@ -322,7 +330,6 @@ class SuggestionsWindowController: NSWindowController {
                 }
             } else {
                 if !hasRecentlyVisitedLabel {
-                    frame.origin.y += 1
                     if recentlyVisitedLabel == nil {
                         recentlyVisitedLabel = SuggestionsWindowController.createLabel("Recently Visited")
                     }
@@ -332,9 +339,9 @@ class SuggestionsWindowController: NSWindowController {
             }
             
             if label != nil {
-                frame.size.height = 22.0
+                label.backgroundColor = headerColor
+                frame.size.height = 21.0
                 label.frame = frame
-                // label.font = NSFont(name: label.font!.fontName, size: 8.0)
                 let fontManager = NSFontManager.shared
                 label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask,
                     weight: 0, size: 11.0)
@@ -404,7 +411,6 @@ class SuggestionsWindowController: NSWindowController {
     static func createLabel(_ name: String) -> NSTextView {
         let label = NSTextView()
         label.string = name
-        label.backgroundColor = NSColor.disabledControlTextColor
         label.isEditable = false
         label.isSelectable = false
         label.textContainerInset = NSSize(width: 0, height: 4)
