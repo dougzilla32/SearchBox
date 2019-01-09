@@ -354,8 +354,14 @@ class SuggestionsWindowController: NSWindowController {
             let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
             let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: frameworkBundle)
             let view = viewController.view as? HighlightingView
-            // Make the selectedView the samee as the 0th.
-            if viewControllers.count == 0 {
+
+            if parentTextField?.stringValue == "" {
+                // If the search box is empty, then select the suggestion that matches the nameValue for the search box (what is reverts to)
+                if entry[kSuggestionLabel] as? String == parentTextField?.nameValue {
+                    selectedView = view
+                }
+            } else if viewControllers.count == 0 {
+                // If the search box is not empty, then select the first suggestion
                 selectedView = view
             }
             // Use the height as set in IB of the prototype view as the heigt for the suggestion view.

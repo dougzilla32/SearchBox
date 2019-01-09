@@ -78,7 +78,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     // The most recently searched name
-    private var nameValue = ""
+    var nameValue = ""
     
     // The most recently selected detail from the suggestions window
     private var detailValue = ""
