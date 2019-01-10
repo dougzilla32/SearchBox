@@ -319,7 +319,7 @@ class SuggestionsWindowController: NSWindowController {
         for entry: [String: Any] in suggestions {
             frame.origin.y += frame.size.height
 
-            if parentTextField?.stringValue == "" || parentTextField?.showFavorites ?? false {
+            if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || parentTextField?.showFavorites ?? false {
                 var label: NSTextView!
                 if (entry[kSuggestionFavorite] as? Bool) ?? false {
                     if !hasFavoritesLabel {
@@ -355,7 +355,7 @@ class SuggestionsWindowController: NSWindowController {
             let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: frameworkBundle)
             let view = viewController.view as? HighlightingView
 
-            if parentTextField?.stringValue == "" || parentTextField?.showFavorites ?? false {
+            if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || parentTextField?.showFavorites ?? false {
                 // If the search box is empty, then select the suggestion that matches the nameValue for the search box (what is reverts to)
                 if entry[kSuggestionLabel] as? String == parentTextField?.nameValue {
                     selectedView = view

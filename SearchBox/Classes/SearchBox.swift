@@ -147,7 +147,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         
         if wantsSelectAll {
             wantsSelectAll = false
-            if self.stringValue != "" {
+            if self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) != "" {
                 if let textEditor = currentEditor() {
                     textEditor.selectAll(self)
                 }
@@ -168,7 +168,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 cancelButtonCell = nil
             }
             
-            if self.stringValue == "" {
+            if self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" {
                 // For an empty text field, the delegate does not receive the begin editing notification.  So we send it ourselves here.
                 NotificationCenter.default.post(name: NSControl.textDidBeginEditingNotification, object: self, userInfo: ["NSFieldEditor": self.window!.fieldEditor(true, for: self)!])
             }
@@ -213,11 +213,11 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             return cancellable(Promise.value(suggestions))
         }
         
-        return searchDelegate.completions(for: self.stringValue).map { items -> [[String: Any]] in
+        return searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)).map { items -> [[String: Any]] in
             var suggestions = [[String: Any]]()
             var alreadyUsed = Set<String>()
             if self.searchHistory != nil {
-                let lowercasedStringValue = self.stringValue.lowercased()
+                let lowercasedStringValue = self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
                 for item in self.searchHistory! where item.name.lowercased().starts(with: lowercasedStringValue) {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
                     alreadyUsed.insert("\(item.name)|\(item.detail)")
@@ -320,8 +320,9 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     private func endEditing() {
         cancelEditing()
 
-        if self.stringValue != "" {
-            searchValue = (name: self.stringValue, detail: detailValue, favorite: favoriteValue)
+        let value = self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        if value != "" {
+            searchValue = (name: value, detail: detailValue, favorite: favoriteValue)
             sendAction(action, to: target)
         } else if nameValue != "" {
             super.stringValue = nameValue
@@ -332,7 +333,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     override open func sendAction(_ action: Selector?, to target: Any?) -> Bool {
         // Workaround for bug where the NSSearchField sends an action event when the user selects all
         // the text and presses the delete key.
-        guard stringValue != "" else {
+        guard stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) != "" else {
             return false
         }
         
