@@ -91,6 +91,9 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // If set to true, select all the text when we get a mouseDown event
     private var wantsSelectAll = false
     
+    // If set to true, show favorites and recently searched rather than completions
+    var showFavorites = false
+    
     // Used to hide the cancel button when the search field does not have the focus.
     private var cancelButtonCell: NSButtonCell?
 
@@ -143,15 +146,15 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
         
         if wantsSelectAll {
-            if self.stringValue != "" {
-                // Simulate Cmd+A for Select All
-                let source = CGEventSource(stateID: CGEventSourceStateID.hidSystemState)
-                let tapLocation = CGEventTapLocation.cghidEventTap
-                let cmdA = CGEvent(keyboardEventSource: source, virtualKey: 0x00, keyDown: true)
-                cmdA?.flags = CGEventFlags.maskCommand
-                cmdA?.post(tap: tapLocation)
-            }
             wantsSelectAll = false
+            if self.stringValue != "" {
+                if let textEditor = currentEditor() {
+                    textEditor.selectAll(self)
+                }
+                showFavorites = true
+                // Let the delegate know the text changed
+                NotificationCenter.default.post(name: NSControl.textDidBeginEditingNotification, object: self, userInfo: ["NSFieldEditor": self.window!.fieldEditor(true, for: self)!])
+            }
         }
     }
 
@@ -248,7 +251,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         cancelAllRequests()
         
         cancelContext = firstly {
-            self.suggestions(forText: text ?? "")
+            self.suggestions(forText: showFavorites ? "" : (text ?? ""))
         }.done { suggestions in
             if suggestions.count > 0 {
                 // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
@@ -262,6 +265,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 // No suggestions. Cancel the suggestion window.
                 self.cancelSuggestions()
             }
+            self.showFavorites = false
         }.catch { error in
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
