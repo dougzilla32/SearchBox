@@ -270,6 +270,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
         }.cancelContext
+        cancelContext?.timeout(after: 10.0)
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
