@@ -17,6 +17,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // Do not take the focus if set to true
     public var refuseFocus: Bool = false
     
+    // Show the "Clear" button for favorites
+    public var showClearFavoritesButton = false
+    
+    // Show the "Clear" button for recently searched
+    public var showClearRecentlyVisitedButton = true
+    
     // Indicates if we should show completions as highlighted text in the text field
     @IBInspectable public var fillCompletions: Bool = false
     

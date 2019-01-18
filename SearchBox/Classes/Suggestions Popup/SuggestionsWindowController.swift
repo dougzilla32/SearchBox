@@ -276,9 +276,9 @@ class SuggestionsWindowController: NSWindowController {
     
     private var favoriteObservers: [(NSMutableDictionary, FavoriteObserver)] = []
     private var favoritesLabel: NSTextView!
-    private var favoritesButton: NSButton!
+    private var favoritesButton: NSButton?
     private var recentlyVisitedLabel: NSTextView!
-    private var recentlyVisitedButton: NSButton!
+    private var recentlyVisitedButton: NSButton?
     private var headerColor: NSColor!
     
     private func clearFavoriteObservers() {
@@ -339,32 +339,35 @@ class SuggestionsWindowController: NSWindowController {
                         if favoritesLabel == nil {
                             label = SuggestionsWindowController.createLabel("Favorites")
                             favoritesLabel = label
-                            button = NSButton()
-                            button.target = self
-                            button.action = #selector(SuggestionsWindowController.toggleFavorites)
+                            if parentTextField?.showClearFavoritesButton ?? false {
+                                button = NSButton()
+                                button.target = self
+                                button.action = #selector(SuggestionsWindowController.toggleFavorites)
+                            }
                             favoritesButton = button
                         } else {
                             label = favoritesLabel
                             button = favoritesButton
                         }
-                        favoritesButton.title = undoFavorites == nil ? "Clear" : "Undo"
+                        favoritesButton?.title = undoFavorites == nil ? "Clear" : "Undo"
                         hasFavoritesLabel = true
                     }
                 } else {
                     if !hasRecentlyVisitedLabel {
                         if recentlyVisitedLabel == nil {
                             label = SuggestionsWindowController.createLabel("Recently Visited")
-                            button = NSButton()
-                            button.target = self
-                            button.action = #selector(SuggestionsWindowController.toggleRecentlyVisited)
-                            
+                            if parentTextField?.showClearRecentlyVisitedButton ?? false {
+                                button = NSButton()
+                                button.target = self
+                                button.action = #selector(SuggestionsWindowController.toggleRecentlyVisited)
+                            }
                             recentlyVisitedLabel = label
                             recentlyVisitedButton = button
                         } else {
                             label = recentlyVisitedLabel
                             button = recentlyVisitedButton
                         }
-                        recentlyVisitedButton.title = undoRecentlyVisited == nil ? "Clear" : "Undo"
+                        recentlyVisitedButton?.title = undoRecentlyVisited == nil ? "Clear" : "Undo"
                         hasRecentlyVisitedLabel = true
                     }
                 }
@@ -458,7 +461,7 @@ class SuggestionsWindowController: NSWindowController {
             recentlyVisitedLabel?.removeFromSuperview()
         }
         if undoRecentlyVisited != nil {
-            recentlyVisitedButton.title = "Undo"
+            recentlyVisitedButton?.title = "Undo"
             frame.origin.y += frame.size.height
             frame.size.height = 21.0
             recentlyVisitedLabel.frame = frame
