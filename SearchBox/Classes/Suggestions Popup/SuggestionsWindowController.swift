@@ -56,7 +56,7 @@ class SuggestionsWindowController: NSWindowController {
     var action: Selector?
     var target: Any?
     private var parentTextField: SearchBox?
-    private var suggestions = [[String: Any]]()
+    var suggestions = [[String: Any]]()
     private var viewControllers = [NSViewController]()
     private var trackingAreas = [AnyHashable]()
     private var needsLayoutUpdate = false
@@ -206,6 +206,10 @@ class SuggestionsWindowController: NSWindowController {
             NSEvent.removeMonitor(localMouseDownEventMonitor!)
             localMouseDownEventMonitor = nil
         }
+        
+        clearFavoriteObservers()
+        clearUndoLists()
+        parentTextField?.searchHistory?.resort()
     }
 
     /* Update the array of suggestions. The array should consist of NSDictionaries each containing the following keys:
@@ -272,9 +276,18 @@ class SuggestionsWindowController: NSWindowController {
     
     private var favoriteObservers: [(NSMutableDictionary, FavoriteObserver)] = []
     private var favoritesLabel: NSTextView!
+    private var favoritesButton: NSButton!
     private var recentlyVisitedLabel: NSTextView!
+    private var recentlyVisitedButton: NSButton!
     private var headerColor: NSColor!
-
+    
+    private func clearFavoriteObservers() {
+        for observer in favoriteObservers {
+            observer.0.removeObserver(observer.1, forKeyPath: kSuggestionFavorite, context: nil)
+        }
+        favoriteObservers.removeAll()
+    }
+    
     // Creates suggestion views from suggestionprototype.xib for every suggestion and resize the suggestion window accordingly. Also creates a thumbnail image on a backgroung aue.
     private func layoutSuggestions() {
         let window: NSWindow? = self.window
@@ -292,12 +305,8 @@ class SuggestionsWindowController: NSWindowController {
             }
         }
         trackingAreas.removeAll()
-        favoritesLabel?.removeFromSuperview()
-        recentlyVisitedLabel?.removeFromSuperview()
-        for observer in favoriteObservers {
-            observer.0.removeObserver(observer.1, forKeyPath: kSuggestionFavorite, context: nil)
-        }
-        favoriteObservers.removeAll()
+        
+        clearFavoriteObservers()
         
         headerColor = NSColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.1)
         if #available(OSX 10.14, *) {
@@ -319,34 +328,70 @@ class SuggestionsWindowController: NSWindowController {
         for entry: [String: Any] in suggestions {
             frame.origin.y += frame.size.height
 
-            if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || parentTextField?.showFavorites ?? false {
+            if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == ""
+                || parentTextField?.showFavorites ?? false
+                || undoFavorites != nil {
                 var label: NSTextView!
-                if (entry[kSuggestionFavorite] as? Bool) ?? false {
+                var button: NSButton!
+                if (entry[kSuggestionFavorite] as? Bool) ?? false
+                    || undoFavoriteNames?.contains(entry[kSuggestionLabel] as! String) ?? false {
                     if !hasFavoritesLabel {
                         if favoritesLabel == nil {
-                            favoritesLabel = SuggestionsWindowController.createLabel("Favorites")
+                            label = SuggestionsWindowController.createLabel("Favorites")
+                            favoritesLabel = label
+                            button = NSButton()
+                            button.target = self
+                            button.action = #selector(SuggestionsWindowController.toggleFavorites)
+                            favoritesButton = button
+                        } else {
+                            label = favoritesLabel
+                            button = favoritesButton
                         }
-                        label = favoritesLabel
+                        favoritesButton.title = undoFavorites == nil ? "Clear" : "Undo"
                         hasFavoritesLabel = true
                     }
                 } else {
                     if !hasRecentlyVisitedLabel {
                         if recentlyVisitedLabel == nil {
-                            recentlyVisitedLabel = SuggestionsWindowController.createLabel("Recently Visited")
+                            label = SuggestionsWindowController.createLabel("Recently Visited")
+                            button = NSButton()
+                            button.target = self
+                            button.action = #selector(SuggestionsWindowController.toggleRecentlyVisited)
+                            
+                            recentlyVisitedLabel = label
+                            recentlyVisitedButton = button
+                        } else {
+                            label = recentlyVisitedLabel
+                            button = recentlyVisitedButton
                         }
-                        label = recentlyVisitedLabel
+                        recentlyVisitedButton.title = undoRecentlyVisited == nil ? "Clear" : "Undo"
                         hasRecentlyVisitedLabel = true
                     }
                 }
                 
                 if label != nil {
-                    label.backgroundColor = headerColor
                     frame.size.height = 21.0
                     label.frame = frame
+                    label.backgroundColor = headerColor
                     let fontManager = NSFontManager.shared
-                    label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask,
-                                                  weight: 0, size: 11.0)
+                    label.font = fontManager.font(withFamily: label.font!.familyName!, traits: NSFontTraitMask.boldFontMask, weight: 0, size: 11.0)
                     contentView?.addSubview(label)
+
+                    if button != nil {
+                        button.bezelStyle = .inline
+                        button.font = NSFont.systemFont(ofSize: 10.0)
+                        button.cell?.backgroundStyle = .lowered
+                        button.sizeToFit()
+                        let inset = (frame.size.height - button.frame.size.height) / 2.0
+                        button.frame = NSRect(
+                            x: frame.size.width - (button.frame.size.width + 10) - inset,
+                            y: inset,
+                            width: button.frame.size.width + 10,
+                            height: button.frame.size.height)
+                        
+                        label.addSubview(button)
+                    }
+
                     frame.origin.y += frame.size.height
                 }
             }
@@ -405,6 +450,19 @@ class SuggestionsWindowController: NSWindowController {
                 })
             }
         }
+        
+        if !hasFavoritesLabel {
+            favoritesLabel?.removeFromSuperview()
+        }
+        if !hasRecentlyVisitedLabel && undoRecentlyVisited == nil {
+            recentlyVisitedLabel?.removeFromSuperview()
+        }
+        if undoRecentlyVisited != nil {
+            recentlyVisitedButton.title = "Undo"
+            frame.origin.y += frame.size.height
+            frame.size.height = 21.0
+            recentlyVisitedLabel.frame = frame
+        }
         /* We have added all of the suggestion to the window. Now set the size of the window.
          */
         // Don't forget to account for the extra room needed the rounded corners.
@@ -424,6 +482,60 @@ class SuggestionsWindowController: NSWindowController {
         return label
     }
 
+    private var undoFavorites: [SearchHistoryItem]?
+    private var undoFavoriteNames: Set<String>?
+    private var undoRecentlyVisited: [SearchHistoryItem]?
+    private var undoRecentlyVisitedNames: Set<String>?
+    
+    private func clearUndoLists() {
+        undoFavorites = nil
+        undoFavoriteNames = nil
+        undoRecentlyVisited = nil
+        undoRecentlyVisitedNames = nil
+    }
+
+    @objc func toggleFavorites(sender: NSButton) {
+        if let favorites = undoFavorites {
+            undoFavorites = nil
+            undoFavoriteNames = nil
+            for f in favorites {
+                f.favorite = true
+            }
+        } else {
+            if let favorites = parentTextField?.searchHistory?.matchingItems(isFavorited: true) {
+                undoFavorites = favorites
+                undoFavoriteNames = Set()
+                for f in favorites {
+                    f.favorite = false
+                    undoFavoriteNames?.insert(f.name)
+                }
+            }
+        }
+        parentTextField?.showFavorites = true
+        parentTextField?.updateSuggestions(from: nil)
+    }
+    
+    @objc func toggleRecentlyVisited() {
+        if let recentlyVisited = undoRecentlyVisited {
+            undoRecentlyVisited = nil
+            undoRecentlyVisitedNames = nil
+            for s in recentlyVisited {
+                parentTextField?.searchHistory?.insert(s)
+            }
+        } else {
+            if let recentlyVisited = parentTextField?.searchHistory?.matchingItems(isFavorited: false) {
+                undoRecentlyVisited = recentlyVisited
+                undoRecentlyVisitedNames = Set()
+                for s in recentlyVisited {
+                    parentTextField?.searchHistory?.remove(s)
+                    undoRecentlyVisitedNames?.insert(s.name)
+                }
+            }
+        }
+        parentTextField?.showFavorites = true
+        parentTextField?.updateSuggestions(from: nil)
+    }
+    
     /* The mouse is now over one of our child image views. Update selection and send action.
      */
     override func mouseEntered(with event: NSEvent) {

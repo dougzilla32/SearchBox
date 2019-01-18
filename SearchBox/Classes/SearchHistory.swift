@@ -74,6 +74,18 @@ public class SearchHistory: Sequence {
         }
     }
     
+    func matchingItems(isFavorited: Bool) -> [SearchHistoryItem] {
+        var arr: [SearchHistoryItem] = []
+        var item: SearchHistoryItem! = last
+        while item !== first {
+            if item.favorite == isFavorited {
+                arr.append(item)
+            }
+            item = item.prev
+        }
+        return arr
+    }
+    
     public func append(name: String, detail: String, favorite: Bool) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
@@ -94,7 +106,7 @@ public class SearchHistory: Sequence {
             if favorite {
                 favoriteCount += 1
             }
-            last.insertAfter(item: item)
+            last.insertAfter(item)
             last = item
         }
     }
@@ -137,15 +149,39 @@ public class SearchHistory: Sequence {
         var cur: SearchHistoryItem! = first.next
         while cur != nil {
             if comparator(cur, item) {
-                cur.prev!.insertAfter(item: item)
+                cur.prev!.insertAfter(item)
                 break
             }
             cur = cur.next
         }
         if cur == nil {
-            last.insertAfter(item: item)
+            last.insertAfter(item)
             last = item
         }
+    }
+    
+    func insert(_ item: SearchHistoryItem) {
+        assert(map[item.name] == nil)
+        map[item.name] = item
+        if item.favorite {
+            favoriteCount += 1
+        }
+        first.insertAfter(item)
+        if last === first {
+            last = item
+        }
+    }
+    
+    func remove(_ item: SearchHistoryItem) {
+        assert(map[item.name] != nil)
+        if last === item {
+            last = item.prev!
+        }
+        map.removeValue(forKey: item.name)
+        if item.favorite {
+            favoriteCount -= 1
+        }
+        item.remove()
     }
     
     public func rename(oldName: String, newName: String) {
@@ -199,7 +235,7 @@ public class SearchHistoryItem {
         timestamp = Date()
     }
     
-    func insertAfter(item: SearchHistoryItem) {
+    func insertAfter(_ item: SearchHistoryItem) {
         item.prev = self
         item.next = next
         next?.prev = item

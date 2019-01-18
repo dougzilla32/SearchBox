@@ -81,7 +81,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     var nameValue = ""
     
     // The most recently selected detail from the suggestions window
-    private var detailValue = ""
+    public var detailValue = ""
 
     // The most recently selected favorite from the suggestions window
     private var favoriteValue = false
@@ -261,6 +261,8 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 if !(self.suggestionsController?.window?.isVisible ?? false) {
                     self.suggestionsController?.begin(for: (control as? SearchBox))
                 }
+            } else if self.showFavorites {
+                self.suggestionsController?.setSuggestions(suggestions)
             } else {
                 // No suggestions. Cancel the suggestion window.
                 self.cancelSuggestions()

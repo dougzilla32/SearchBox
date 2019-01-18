@@ -12,3 +12,7 @@ public protocol SearchBoxDelegate {
     
     func favoriteUpdated(name: String, detail: String, favorite: Bool)
 }
+
+public extension SearchBoxDelegate {
+    func favoriteUpdated(name: String, detail: String, favorite: Bool) { }
+}
