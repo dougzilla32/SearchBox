@@ -1,12 +1,18 @@
 PODS:
+  - PromiseKit (6.5.0):
+    - PromiseKit/CorePromise (= 6.5.0)
+    - PromiseKit/Foundation (= 6.5.0)
+    - PromiseKit/UIKit (= 6.5.0)
   - PromiseKit/CorePromise (6.5.0)
+  - PromiseKit/Foundation (6.5.0):
+    - PromiseKit/CorePromise
   - SearchBox (1.0.0):
     - PromiseKit/CorePromise (~> 6.5)
     - SwiftyBeaver (~> 1.5)
   - SwiftyBeaver (1.6.1)
 
 DEPENDENCIES:
-  - PromiseKit/CorePromise (from `https://github.com/dougzilla32/PromiseKitCoreCancel`)
+  - PromiseKit (from `~/Desktop/Xcode Projects/Libraries/PromiseKitCore`)
   - SearchBox (from `../`)
   - SwiftyBeaver (~> 1.5)
 
@@ -16,20 +22,15 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   PromiseKit:
-    :git: https://github.com/dougzilla32/PromiseKitCoreCancel
+    :path: "~/Desktop/Xcode Projects/Libraries/PromiseKitCore"
   SearchBox:
     :path: "../"
 
-CHECKOUT OPTIONS:
-  PromiseKit:
-    :commit: 16daa6caf1df07dc6ce05166bd3d38287e4b71b4
-    :git: https://github.com/dougzilla32/PromiseKitCoreCancel
-
 SPEC CHECKSUMS:
-  PromiseKit: cc0627c4441dea85713ab6b79550a275e637b98f
+  PromiseKit: 1ade5ea41e88882cb654f2c726d275bb93a20360
   SearchBox: c1b5d0e740cd6d750674c80b99789880065edc20
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
 
-PODFILE CHECKSUM: 442d629cb11c18484bad66973908dc2660f79d30
+PODFILE CHECKSUM: d33e316acea64d524c099661798037df3dcef77d
 
 COCOAPODS: 1.5.3
