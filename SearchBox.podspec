@@ -37,9 +37,7 @@ https://developer.apple.com/library/content/samplecode/CustomMenus
 
   s.swift_version = "4.1"
   
-  s.resource_bundles = {
-    'SearchBox' => ['SearchBox/**/*.xib']
-  }
+  s.resources = 'SearchBox/**/*.xcassets'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'Cocoa'
