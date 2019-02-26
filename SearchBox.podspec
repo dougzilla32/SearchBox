@@ -35,13 +35,13 @@ https://developer.apple.com/library/content/samplecode/CustomMenus
 
   s.source_files = 'SearchBox/Classes/**/*'
 
-  s.swift_version = "4.1"
+  s.swift_version = "5.0"
   
   s.resources = 'SearchBox/**/*.xcassets'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'Cocoa'
   
-  s.dependency 'PromiseKit/CorePromise', '~> 6.5'
+  s.dependency 'PromiseKit/CorePromise', '~> 7.0'
   s.dependency 'SwiftyBeaver', '~> 1.5'
 end

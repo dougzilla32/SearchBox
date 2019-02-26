@@ -1,13 +1,13 @@
 PODS:
-  - PromiseKit (6.5.0):
-    - PromiseKit/CorePromise (= 6.5.0)
-    - PromiseKit/Foundation (= 6.5.0)
-    - PromiseKit/UIKit (= 6.5.0)
-  - PromiseKit/CorePromise (6.5.0)
-  - PromiseKit/Foundation (6.5.0):
+  - PromiseKit (7.0.0):
+    - PromiseKit/CorePromise (= 7.0.0)
+    - PromiseKit/Foundation (= 7.0.0)
+    - PromiseKit/UIKit (= 7.0.0)
+  - PromiseKit/CorePromise (7.0.0)
+  - PromiseKit/Foundation (7.0.0):
     - PromiseKit/CorePromise
   - SearchBox (1.0.0):
-    - PromiseKit/CorePromise (~> 6.5)
+    - PromiseKit/CorePromise (~> 7.0)
     - SwiftyBeaver (~> 1.5)
   - SwiftyBeaver (1.6.1)
 
@@ -27,8 +27,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PromiseKit: 1ade5ea41e88882cb654f2c726d275bb93a20360
-  SearchBox: 2fa9c39222f4a427a171f4d5cf6f52b9acada34d
+  PromiseKit: b7f5a5dd2928199cb1e00e49188c212de728d5df
+  SearchBox: 9f233836cc4c9e9e64c0c3e6447d896cb2caf8a6
   SwiftyBeaver: ccfcdf85a04d429f1633f668650b0ce8020bda3a
 
 PODFILE CHECKSUM: a15965be1b709ebc3f969fab01fcfd1441469c73
