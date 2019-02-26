@@ -78,7 +78,7 @@ class RoundedCornersView: NSView {
     /* The suggestions will be an AXList of suggestions.  AXList requires additional attributes beyond what NSView provides.
      */
     @available(OSX, deprecated: 10.10)
-    override func accessibilityAttributeNames() -> [NSAccessibilityAttributeName] {
+    override func accessibilityAttributeNames() -> [NSAccessibility.Attribute] {
         var attributeNames = super.accessibilityAttributeNames()
         attributeNames.append(.orientation)
         attributeNames.append(.enabled)
@@ -90,10 +90,10 @@ class RoundedCornersView: NSView {
     /* Return a different value for the role attribute, and the values for the additional attributes declared above.
      */
     @available(OSX, deprecated: 10.10)
-    override func accessibilityAttributeValue(_ attribute: NSAccessibilityAttributeName) -> Any? {
+    override func accessibilityAttributeValue(_ attribute: NSAccessibility.Attribute) -> Any? {
         // Report our role as AXList
         if attribute == .role {
-            return NSAccessibilityRole.list
+            return NSAccessibility.Role.list
             // Our orientation is vertical
         } else if attribute == .orientation {
             return NSAccessibilityOrientation.vertical
@@ -125,7 +125,7 @@ class RoundedCornersView: NSView {
     /* In addition to reporting the value for an attribute, we need to return whether value of the attribute can be set.
      */
     @available(OSX, deprecated: 10.10)
-    override func accessibilityIsAttributeSettable(_ attribute: NSAccessibilityAttributeName) -> Bool {
+    override func accessibilityIsAttributeSettable(_ attribute: NSAccessibility.Attribute) -> Bool {
         // Three of the four attributes we added are not settable
         if attribute == .orientation || attribute == .enabled || attribute == .visibleChildren || attribute == .selectedChildren {
             return false
@@ -138,7 +138,7 @@ class RoundedCornersView: NSView {
     }
 
     @available(OSX, deprecated: 10.10)
-    override func accessibilitySetValue(_ value: Any?, forAttribute attribute: NSAccessibilityAttributeName) {
+    override func accessibilitySetValue(_ value: Any?, forAttribute attribute: NSAccessibility.Attribute) {
         if attribute == .selectedChildren {
             let windowController: NSWindowController? = window?.windowController
             if windowController != nil {

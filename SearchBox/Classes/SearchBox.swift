@@ -137,7 +137,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         if #available(OSX 10.11, *) {
             let location = convert(event.locationInWindow, from: nil)
             let rect = rectForCancelButton(whenCentered: false)
-            if mouse(location, in: rect) {
+            if isMousePoint(location, in: rect) {
                 // Intercept the cancelButtonCell mouseDown event -- the default behavior causes
                 // the search field to give up the focus which is not our desired behavior.
                 super.stringValue = ""
@@ -256,7 +256,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         
         cancelAllRequests()
         
-        cancelContext = firstly {
+        let p = firstly {
             self.suggestions(forText: showFavorites ? "" : (text ?? ""))
         }.done { suggestions in
             if suggestions.count > 0 {
@@ -274,11 +274,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 self.cancelSuggestions()
             }
             self.showFavorites = false
-        }.catch { error in
+        }
+        cancelContext = p.catch { error in
             // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
             SwiftyBeaver.error(error)
         }.cancelContext
-        cancelContext?.timeout(after: 10.0)
+        
+        _ = race(p, cancellable(timeout(seconds: 10.0)))
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
@@ -364,7 +366,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
 
     /* In interface builder, we set this class object as the delegate for the search text field. When the user starts editing the text field, this method is called. This is an opportune time to display the initial suggestions.
      */
-    override public func controlTextDidBeginEditing(_ notification: Notification) {
+    public func controlTextDidBeginEditing(_ notification: Notification) {
         if !skipNextSuggestion {
             if suggestionsController == nil {
                 suggestionsController = SuggestionsWindowController()
@@ -377,7 +379,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     /* The field editor's text may have changed for a number of reasons. Generally, we should update the suggestions window with the new suggestions. However, in some cases (the user deletes characters) we cancel the suggestions window.
      */
-    override public func controlTextDidChange(_ notification: Notification) {
+    public func controlTextDidChange(_ notification: Notification) {
         if !skipNextSuggestion {
             updateSuggestions(from: notification.object as? NSControl)
         } else {
@@ -392,7 +394,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     /* The field editor has ended editing the text. This is not the same as the action from the NSTextField. In the MainMenu.xib, the search text field is setup to only send its action on return / enter. If the user tabs to or clicks on another control, text editing will end and this method is called. We don't consider this committal of the action. Instead, we realy on the text field's action to commit
      the suggestion. However, since the action may not occur, we need to cancel the suggestions window here.
      */
-    override public func controlTextDidEndEditing(_ obj: Notification) {
+    public func controlTextDidEndEditing(_ obj: Notification) {
         suggestionsController?.cancelSuggestions()
     }
     
@@ -468,8 +470,8 @@ extension DispatchWorkItem: Equatable {
 }
 
 extension DispatchWorkItem: Hashable {
-    public var hashValue: Int {
+    public func hash(into hasher: inout Hasher) {
         // Use the instance's unique identifier for hashing
-        return ObjectIdentifier(self).hashValue
+        hasher.combine(ObjectIdentifier(self))
     }
 }

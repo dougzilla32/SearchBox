@@ -64,8 +64,8 @@ class SuggestionsWindowController: NSWindowController {
     private var lostFocusObserver: Any?
     private var cursorInsideView = false
     
-    private var favoriteImage = NSImage(named: NSImage.Name(rawValue: "Heart"))
-    private var favoriteOutlineImage = NSImage(named: NSImage.Name(rawValue: "Heart outline"))
+    private var favoriteImage = NSImage(named: "Heart")
+    private var favoriteOutlineImage = NSImage(named: "Heart outline")
 
     init() {
         let contentRec = NSRect(x: 0, y: 0, width: 20, height: 20)
@@ -129,11 +129,11 @@ class SuggestionsWindowController: NSWindowController {
         // The window must know its accessibility parent, the control must know the window one of its accessibility children
         // Note that views (controls especially) are often ignored, so we want the unignored descendant - usually a cell
         // Finally, post that we have created the unignored decendant of the suggestions window
-        let unignoredAccessibilityDescendant = NSAccessibilityUnignoredDescendant(parentTextField!)
+        let unignoredAccessibilityDescendant = NSAccessibility.unignoredDescendant(of: parentTextField!)
         (suggestionWindow as? SuggestionsWindow)?.parentElement = unignoredAccessibilityDescendant
         (unignoredAccessibilityDescendant as? SuggestibleTextFieldCell)?.suggestionsWindow = suggestionWindow
-        if let win = suggestionWindow, let winD = NSAccessibilityUnignoredDescendant(win) {
-            NSAccessibilityPostNotification(winD, .created)
+        if let win = suggestionWindow, let winD = NSAccessibility.unignoredDescendant(of: win) {
+            NSAccessibility.post(element: winD, notification: .created)
         }
         // setup auto cancellation if the user clicks outside the suggestion window and parent text field. Note: this is a local event monitor and will only catch clicks in windows that belong to this application. We use another technique below to catch clicks in other application windows.
         localMouseDownEventMonitor = NSEvent.addLocalMonitorForEvents(matching: [NSEvent.EventTypeMask.leftMouseDown, NSEvent.EventTypeMask.rightMouseDown, NSEvent.EventTypeMask.otherMouseDown], handler: {(_ event: NSEvent) -> NSEvent? in
@@ -400,7 +400,7 @@ class SuggestionsWindowController: NSWindowController {
             }
             
             let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
-            let viewController = NSViewController(nibName: NSNib.Name(rawValue: "suggestionprototype"), bundle: frameworkBundle)
+            let viewController = NSViewController(nibName: "suggestionprototype", bundle: frameworkBundle)
             let view = viewController.view as? HighlightingView
 
             if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || parentTextField?.showFavorites ?? false {
@@ -443,10 +443,10 @@ class SuggestionsWindowController: NSWindowController {
              */
             if mutableEntry[kSuggestionImage] == nil && mutableEntry[kSuggestionImageURL] != nil {
                 // Load the image in an operation block so that the window pops up immediatly
-                ITESharedOperationQueue()?.addOperation({(_: Void) -> Void in
+                ITESharedOperationQueue()?.addOperation({
                     if let fileURL = mutableEntry[kSuggestionImageURL] as? URL,
                         let thumbnailImage = NSImage.iteThumbnailImage(withContentsOf: fileURL, width: kThumbnailWidth) {
-                        OperationQueue.main.addOperation({(_: Void) -> Void in
+                        OperationQueue.main.addOperation({
                             mutableEntry[kSuggestionImage] = thumbnailImage
                         })
                     }
