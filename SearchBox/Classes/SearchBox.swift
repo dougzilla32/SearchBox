@@ -216,7 +216,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                     suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
                 }
             }
-            return cancellable(Promise.value(suggestions))
+            return cancellize(Promise.value(suggestions))
         }
         
         return searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)).map { items -> [[String: Any]] in
@@ -280,7 +280,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             SwiftyBeaver.error(error)
         }.cancelContext
         
-        _ = race(p, cancellable(timeout(seconds: 10.0)))
+        _ = race(p, cancellize(timeout(seconds: 10.0)))
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
