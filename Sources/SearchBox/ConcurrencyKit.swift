@@ -16,7 +16,7 @@ struct TimedOutError: Error, Equatable {}
 /// Execute an operation in the current task subject to a timeout.
 ///
 /// - Parameters:
-///   - nanoseconds: The duration in seconds `operation` is allowed to run before timing out.
+///   - seconds: The duration in seconds `operation` is allowed to run before timing out.
 ///   - operation: The async operation to perform.
 /// - Returns: Returns the result of `operation` if it completed in time.
 /// - Throws: Throws ``TimedOutError`` if the timeout expires before `operation` completes.
