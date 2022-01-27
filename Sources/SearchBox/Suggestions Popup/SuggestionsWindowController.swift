@@ -40,7 +40,6 @@
  Copyright (C) 2012 Apple Inc. All Rights Reserved.
  */
 import Cocoa
-import SwiftyBeaver
 
 let kTrackerKey = "whichImageView"
 let kThumbnailWidth: CGFloat = 24.0

@@ -5,9 +5,8 @@
 //  Created by Doug Stein on 4/13/18.
 //
 
+import ConcurrencyKit
 import Cocoa
-import PromiseKit
-import SwiftyBeaver
 
 @IBDesignable
 public class SearchBox: NSSearchField, NSSearchFieldDelegate {
@@ -200,48 +199,17 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
     }
     
-    var cancelContext: CancelContext?
+    var completionsTask: Task<Void, Never>?
 
-    func cancelAllRequests() {
-        cancelContext?.cancel()
-        cancelContext = nil
-    }
-    
-    func suggestions(forText text: String) -> CancellablePromise<[[String: Any]]> {
-        let searchDelegate: SearchBoxDelegate! = self.searchBoxDelegate
-        if text == "" || searchDelegate == nil {
-            var suggestions = [[String: Any]]()
-            if searchHistory != nil {
-                for item in searchHistory! {
-                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
-                }
-            }
-            return cancellize(Promise.value(suggestions))
-        }
-        
-        return searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)).map { items -> [[String: Any]] in
-            var suggestions = [[String: Any]]()
-            var alreadyUsed = Set<String>()
-            if self.searchHistory != nil {
-                let lowercasedStringValue = self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
-                for item in self.searchHistory! where item.name.lowercased().starts(with: lowercasedStringValue) {
-                    suggestions.append([kSuggestionLabel: item.name, kSuggestionDetailedLabel: item.detail, kSuggestionFavorite: item.favorite])
-                    alreadyUsed.insert("\(item.name)|\(item.detail)")
-                }
-            }
-            for item in items {
-                if !alreadyUsed.contains("\(item.0)|\(item.1)") {
-                    suggestions.append([kSuggestionLabel: item.0, kSuggestionDetailedLabel: item.1, kSuggestionFavorite: item.2])
-                }
-            }
-            return suggestions
-        }
+    func cancelCompletionsTask() {
+        completionsTask?.cancel()
+        completionsTask = nil
     }
     
     /* Determines the current list of suggestions, display the suggestions and update the field editor.
      */
-    func updateSuggestions(from control: NSControl?) {
-        guard let fieldEditor = self.window?.fieldEditor(false, for: control) else {
+    @MainActor func updateSuggestions(from control: NSControl?) {
+        guard let control = control, let fieldEditor = self.window?.fieldEditor(false, for: control) else {
             return
         }
         
@@ -254,33 +222,69 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             text = fieldEditor.string
         }
         
-        cancelAllRequests()
-        
-        let p = firstly {
-            self.suggestions(forText: showFavorites ? "" : (text ?? ""))
-        }.done { suggestions in
-            if suggestions.count > 0 {
-                // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
-                let suggestion = suggestions[0]
-                self.updateFieldEditor(fieldEditor, withSuggestion: suggestion[kSuggestionLabel] as? String)
-                self.suggestionsController?.setSuggestions(suggestions)
-                if !(self.suggestionsController?.window?.isVisible ?? false) {
-                    self.suggestionsController?.begin(for: (control as? SearchBox))
+        guard text != "", let searchDelegate = self.searchBoxDelegate else {
+            var completionItems = [SearchBoxCompletion]()
+            if let searchHistory = searchHistory {
+                for hItem in searchHistory {
+                    completionItems.append(SearchBoxCompletion(name: hItem.name, detail: hItem.detail, favorite: hItem.favorite))
                 }
-            } else if self.showFavorites {
-                self.suggestionsController?.setSuggestions(suggestions)
-            } else {
-                // No suggestions. Cancel the suggestion window.
-                self.cancelSuggestions()
             }
-            self.showFavorites = false
+            completionsReceived(items: completionItems, control: control, fieldEditor: fieldEditor)
+            return
         }
-        cancelContext = p.catch { error in
-            // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
-            SwiftyBeaver.error(error)
-        }.cancelContext
+
+        cancelCompletionsTask()
+        let task = Task {
+            do {
+                try await withTimeout(seconds: 10) {
+                    let items = try await searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+                    await MainActor.run {
+                        self.completionsReceived(items: items, control: control, fieldEditor: fieldEditor)
+                        self.showFavorites = false
+                    }
+                }
+            }
+            catch {
+                // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
+                // TODO: indicate error to the user somehow, used to use SwiftyBeaver
+                print(error)
+            }
+        }
+
+        self.completionsTask = task
+    }
+    
+    func completionsReceived(items completionItems: [SearchBoxCompletion], control: NSControl, fieldEditor: NSText) {
+        var suggestions = [[String: Any]]()
+        var alreadyUsed = Set<String>()
+        if self.searchHistory != nil {
+            let lowercasedStringValue = self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
+            for hItem in self.searchHistory! where hItem.name.lowercased().starts(with: lowercasedStringValue) {
+                suggestions.append([kSuggestionLabel: hItem.name, kSuggestionDetailedLabel: hItem.detail, kSuggestionFavorite: hItem.favorite])
+                alreadyUsed.insert("\(hItem.name)|\(hItem.detail)")
+            }
+        }
+        for cItem in completionItems {
+            if !alreadyUsed.contains("\(cItem.name)|\(cItem.detail)") {
+                suggestions.append([kSuggestionLabel: cItem.name, kSuggestionDetailedLabel: cItem.detail, kSuggestionFavorite: cItem.favorite])
+            }
+        }
         
-        _ = race(p, cancellize(timeout(seconds: 10.0)))
+        if suggestions.count > 0 {
+            // We have at least 1 suggestion. Update the field editor to the first suggestion and show the suggestions window.
+            let suggestion = suggestions[0]
+            self.updateFieldEditor(fieldEditor, withSuggestion: suggestion[kSuggestionLabel] as? String)
+            self.suggestionsController?.setSuggestions(suggestions)
+            if !(self.suggestionsController?.window?.isVisible ?? false) {
+                self.suggestionsController?.begin(for: (control as? SearchBox))
+            }
+        } else if self.showFavorites {
+            self.suggestionsController?.setSuggestions(suggestions)
+        } else {
+            // No suggestions. Cancel the suggestion window.
+            self.cancelSuggestions()
+        }
+        self.showFavorites = false
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
@@ -310,7 +314,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     func cancelSuggestions() {
-        cancelAllRequests()
+        cancelCompletionsTask()
         
         /* If the suggestionController is already in a cancelled state, this call does nothing and is therefore always safe to call.
          */

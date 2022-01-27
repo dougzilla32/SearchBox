@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "ConcurrencyKit",
+        "repositoryURL": "https://github.com/dougzilla32/ConcurrencyKit",
+        "state": {
+          "branch": null,
+          "revision": "a5d64b8dbd004b3f228951ab1eb8ac91ea89f13e",
+          "version": "1.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
