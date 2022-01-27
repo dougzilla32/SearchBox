@@ -11,6 +11,8 @@
 		9186C91127A2696000EDBD7C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9186C91027A2696000EDBD7C /* ViewController.swift */; };
 		9186C91327A2696100EDBD7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9186C91227A2696100EDBD7C /* Assets.xcassets */; };
 		9186C91627A2696100EDBD7C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9186C91427A2696100EDBD7C /* Main.storyboard */; };
+		9186C92127A26CAA00EDBD7C /* SearchBox in Frameworks */ = {isa = PBXBuildFile; productRef = 9186C92027A26CAA00EDBD7C /* SearchBox */; };
+		9186C92427A26DE300EDBD7C /* ConcurrencyKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9186C92327A26DE300EDBD7C /* ConcurrencyKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +29,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9186C92127A26CAA00EDBD7C /* SearchBox in Frameworks */,
+				9186C92427A26DE300EDBD7C /* ConcurrencyKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +89,10 @@
 			dependencies = (
 			);
 			name = SearchBoxExample;
+			packageProductDependencies = (
+				9186C92027A26CAA00EDBD7C /* SearchBox */,
+				9186C92327A26DE300EDBD7C /* ConcurrencyKit */,
+			);
 			productName = SearchBoxExample;
 			productReference = 9186C90B27A2696000EDBD7C /* SearchBoxExample.app */;
 			productType = "com.apple.product-type.application";
@@ -113,6 +121,10 @@
 				Base,
 			);
 			mainGroup = 9186C90227A2696000EDBD7C;
+			packageReferences = (
+				9186C91F27A26CAA00EDBD7C /* XCRemoteSwiftPackageReference "." */,
+				9186C92227A26DE300EDBD7C /* XCRemoteSwiftPackageReference "ConcurrencyKit" */,
+			);
 			productRefGroup = 9186C90C27A2696000EDBD7C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -349,6 +361,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9186C91F27A26CAA00EDBD7C /* XCRemoteSwiftPackageReference "." */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = ../;
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		9186C92227A26DE300EDBD7C /* XCRemoteSwiftPackageReference "ConcurrencyKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dougzilla32/ConcurrencyKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9186C92027A26CAA00EDBD7C /* SearchBox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9186C91F27A26CAA00EDBD7C /* XCRemoteSwiftPackageReference "." */;
+			productName = SearchBox;
+		};
+		9186C92327A26DE300EDBD7C /* ConcurrencyKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9186C92227A26DE300EDBD7C /* XCRemoteSwiftPackageReference "ConcurrencyKit" */;
+			productName = ConcurrencyKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9186C90327A2696000EDBD7C /* Project object */;
 }

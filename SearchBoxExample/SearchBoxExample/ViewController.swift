@@ -8,7 +8,6 @@
 
 import Cocoa
 import SearchBox
-import PromiseKit
 
 class ViewController: NSViewController, NSWindowDelegate, SearchBoxDelegate {
     @IBOutlet weak var searchBox: SearchBox!

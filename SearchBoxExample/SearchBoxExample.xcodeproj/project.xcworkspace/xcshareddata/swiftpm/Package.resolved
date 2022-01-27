@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "ConcurrencyKit",
+        "repositoryURL": "https://github.com/dougzilla32/ConcurrencyKit",
+        "state": {
+          "branch": "main",
+          "revision": "a5d64b8dbd004b3f228951ab1eb8ac91ea89f13e",
+          "version": null
+        }
+      },
+      {
+        "package": "SearchBox",
+        "repositoryURL": "/Users/doug/Desktop/XcodeProjects/Libraries/SearchBox",
+        "state": {
+          "branch": null,
+          "revision": "dfb33abaaec60c1ae8cfb2a5dc6510c0c11d1c5e",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

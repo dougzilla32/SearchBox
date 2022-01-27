@@ -5,7 +5,6 @@
 //  Created by Doug Stein on 4/13/18.
 //
 
-import ConcurrencyKit
 import Cocoa
 
 @IBDesignable
