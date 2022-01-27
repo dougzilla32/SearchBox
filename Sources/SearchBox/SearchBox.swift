@@ -233,7 +233,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
 
         cancelCompletionsTask()
-        let task = Task {
+        self.completionsTask = Task {
             do {
                 try await withTimeout(seconds: 10) {
                     let items = try await searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
@@ -248,9 +248,8 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
                 // TODO: indicate error to the user somehow, used to use SwiftyBeaver
                 print(error)
             }
+            self.completionsTask = nil
         }
-
-        self.completionsTask = task
     }
     
     func completionsReceived(items completionItems: [SearchBoxCompletion], control: NSControl, fieldEditor: NSText) {
