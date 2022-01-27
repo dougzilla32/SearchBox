@@ -6,6 +6,12 @@
 //
 
 public struct SearchBoxCompletion {
+    public init(name: String, detail: String, favorite: Bool) {
+        self.name = name
+        self.detail = detail
+        self.favorite = favorite
+    }
+    
     public let name: String
     public let detail: String
     public let favorite: Bool
