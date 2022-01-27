@@ -398,8 +398,7 @@ class SuggestionsWindowController: NSWindowController {
                 }
             }
             
-            let frameworkBundle = Bundle(for: SuggestionsWindowController.self)
-            let viewController = NSViewController(nibName: "suggestionprototype", bundle: frameworkBundle)
+            let viewController = NSViewController(nibName: "suggestionprototype", bundle: Bundle.module)
             let view = viewController.view as? HighlightingView
 
             if parentTextField?.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || parentTextField?.showFavorites ?? false {
