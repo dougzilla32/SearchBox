@@ -7,7 +7,7 @@
 
 import Foundation.NSDate // for TimeInterval
 
-public struct TimedOutError: Error, Equatable {}
+public struct TaskTimeoutError: Error, Equatable {}
 
 ///
 /// Derived from work by Ole Begemann
@@ -40,7 +40,7 @@ public func withTimeout<R>(
             }
             try Task.checkCancellation()
             // We’ve reached the timeout.
-            throw TimedOutError()
+            throw TaskTimeoutError()
         }
         // First finished child task wins, cancel the other task.
         let result = try await group.next()!
