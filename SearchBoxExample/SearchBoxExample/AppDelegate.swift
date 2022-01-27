@@ -7,24 +7,14 @@
 //
 
 import Cocoa
-import SwiftyBeaver
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        setupSwiftyBeaverLogging()
-    }
-    
-    func setupSwiftyBeaverLogging() {
-        let console = ConsoleDestination()
-        console.minLevel = .verbose
-        SwiftyBeaver.addDestination(console)
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
     }
-    
 }
 

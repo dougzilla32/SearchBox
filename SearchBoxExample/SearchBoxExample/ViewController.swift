@@ -38,13 +38,13 @@ class ViewController: NSViewController, NSWindowDelegate, SearchBoxDelegate {
     
     // MARK: SearchBoxDelegate
 
-    func completions(for text: String) -> CancellablePromise<[(String, String, Bool)]> {
-        var completions = [(String, String, Bool)]()
+    func completions(for text: String) async throws -> [SearchBoxCompletion] {
+        var completions = [SearchBoxCompletion]()
         if let spellCompletions = NSSpellChecker.shared.completions(forPartialWordRange: NSMakeRange(0, text.count), in: text, language: nil, inSpellDocumentWithTag: 0) {
             for s in spellCompletions {
-                completions.append((s, "us", false))
+                completions.append(SearchBoxCompletion(name: s, detail: "us", favorite: false))
             }
         }
-        return cancellable(Promise.value(completions))
+        return completions
     }
 }
