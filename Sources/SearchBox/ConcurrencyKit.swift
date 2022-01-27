@@ -7,7 +7,7 @@
 
 import Foundation.NSDate // for TimeInterval
 
-struct TimedOutError: Error, Equatable {}
+public struct TimedOutError: Error, Equatable {}
 
 ///
 /// Derived from work by Ole Begemann
