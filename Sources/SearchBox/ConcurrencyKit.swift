@@ -17,7 +17,7 @@ public struct TaskTimeoutError: Error, Equatable {}
 ///
 /// - Parameters:
 ///   - seconds: The duration in seconds `operation` is allowed to run before timing out.
-///   - operation: The async operation to perform.
+///   - operation: The async operation to perform on a background thread.
 /// - Returns: Returns the result of `operation` if it completed in time.
 /// - Throws: Throws ``TimedOutError`` if the timeout expires before `operation` completes.
 ///   If `operation` throws an error before the timeout expires, that error is propagated to the caller.
@@ -36,7 +36,47 @@ public func withTimeout<R>(
         group.addTask {
             let interval = deadline.timeIntervalSinceNow
             if interval > 0 {
-                try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+                try await Task.sleep(seconds: interval)
+            }
+            try Task.checkCancellation()
+            // We’ve reached the timeout.
+            throw TaskTimeoutError()
+        }
+        // First finished child task wins, cancel the other task.
+        let result = try await group.next()!
+        group.cancelAll()
+        return result
+    }
+}
+
+///
+/// Derived from work by Ole Begemann
+/// https://forums.swift.org/t/running-an-async-task-with-a-timeout/49733
+///
+/// Execute an operation in the current task, on the main actor, subject to a timeout.
+///
+/// - Parameters:
+///   - seconds: The duration in seconds `operation` is allowed to run before timing out.
+///   - operation: The async operation to perform on the main thread.
+/// - Returns: Returns the result of `operation` if it completed in time.
+/// - Throws: Throws ``TimedOutError`` if the timeout expires before `operation` completes.
+///   If `operation` throws an error before the timeout expires, that error is propagated to the caller.
+public func withTimeoutOnMainActor<R>(
+    seconds: TimeInterval,
+    operation: @escaping @MainActor @Sendable () async throws -> R
+) async throws -> R {
+    return try await withThrowingTaskGroup(of: R.self) { group in
+        let deadline = Date(timeIntervalSinceNow: seconds)
+
+        // Start actual work.
+        group.addTask {
+            return try await operation()
+        }
+        // Start timeout child task.
+        group.addTask {
+            let interval = deadline.timeIntervalSinceNow
+            if interval > 0 {
+                try await Task.sleep(seconds: interval)
             }
             try Task.checkCancellation()
             // We’ve reached the timeout.

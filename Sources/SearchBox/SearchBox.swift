@@ -207,7 +207,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     
     /* Determines the current list of suggestions, display the suggestions and update the field editor.
      */
-    @MainActor func updateSuggestions(from control: NSControl?) {
+    func updateSuggestions(from control: NSControl?) {
         guard let control = control, let fieldEditor = self.window?.fieldEditor(false, for: control) else {
             return
         }
@@ -235,13 +235,12 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         cancelCompletionsTask()
         self.completionsTask = Task {
             do {
-                try await withTimeout(seconds: 10) {
-                    let items = try await searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
-                    await MainActor.run {
-                        self.completionsReceived(items: items, control: control, fieldEditor: fieldEditor)
-                        self.showFavorites = false
-                    }
+                let items = try await withTimeout(seconds: 10) {
+                    return try await searchDelegate.completions(for: self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
                 }
+
+                self.completionsReceived(items: items, control: control, fieldEditor: fieldEditor)
+                self.showFavorites = false
             }
             catch {
                 // TODO: indicate to the user that the suggestions are not working -- most likely due to the network being unavailable -- show a network down indicator on the refresh button
