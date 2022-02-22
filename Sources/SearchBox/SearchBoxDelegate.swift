@@ -20,7 +20,7 @@ public struct SearchBoxCompletion {
 public protocol SearchBoxDelegate {
     func completions(for text: String) async throws -> [SearchBoxCompletion]
     
-    func favoriteUpdated(name: String, detail: String, favorite: Bool)
+    @MainActor func favoriteUpdated(name: String, detail: String, favorite: Bool)
 }
 
 public extension SearchBoxDelegate {

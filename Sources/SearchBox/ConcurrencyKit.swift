@@ -70,7 +70,10 @@ public func withTimeoutOnMainActor<R>(
 
         // Start actual work.
         group.addTask {
-            return try await operation()
+            // Need to separately call 'onMainActor' to force onto the main thread, because
+            // calling 'group.addTask' casts 'operation' to a non-MainActor closure (not sure
+            // why the compiler allows this...)
+            return try await onMainActor(operation: operation)
         }
         // Start timeout child task.
         group.addTask {
@@ -89,6 +92,10 @@ public func withTimeoutOnMainActor<R>(
     }
 }
 
+@MainActor private func onMainActor<R>(operation: @escaping @MainActor @Sendable () async throws -> R) async throws -> R {
+    return try await operation()
+}
+
 extension Task where Success == Never, Failure == Never {
     /// Suspends the current task for at least the given duration
     /// in  seconds.
@@ -99,5 +106,11 @@ extension Task where Success == Never, Failure == Never {
     /// This function doesn't block the underlying thread.
     public static func sleep(seconds duration: TimeInterval) async throws {
         try await Task.sleep(nanoseconds: UInt64(duration * Double(1_000_000_000)))
+    }
+}
+
+extension ThrowingTaskGroup {
+    public mutating func addTaskMainActor(priority: TaskPriority? = nil, operation: @escaping @Sendable @MainActor () async throws -> ChildTaskResult) async {
+        return addTask(priority: priority, operation: operation)
     }
 }
