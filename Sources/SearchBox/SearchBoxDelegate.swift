@@ -24,5 +24,5 @@ public protocol SearchBoxDelegate {
 }
 
 public extension SearchBoxDelegate {
-    func favoriteUpdated(name: String, detail: String, favorite: Bool) { }
+    @MainActor func favoriteUpdated(name: String, detail: String, favorite: Bool) { }
 }
