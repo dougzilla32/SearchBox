@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class SearchHistory: Sequence {
+@MainActor public class SearchHistory {
     private var first: SearchHistoryItem
     private var last: SearchHistoryItem
     public internal(set) var limit: Int
@@ -20,7 +20,7 @@ public class SearchHistory: Sequence {
         }
     }
     
-    static func nameComparator(item1: SearchHistoryItem, item2: SearchHistoryItem) -> Bool {
+    nonisolated static func nameComparator(item1: SearchHistoryItem, item2: SearchHistoryItem) -> Bool {
         if item1.favorite != item2.favorite {
             return item1.favorite && !item2.favorite
         }
@@ -200,22 +200,18 @@ public class SearchHistory: Sequence {
         }
     }
     
-    public func makeIterator() -> SearchHistory.SearchHistoryIterator {
-        return SearchHistoryIterator(currentItem: last, firstItem: first)
-    }
-    
-    public struct SearchHistoryIterator: IteratorProtocol {
-        var currentItem: SearchHistoryItem
-        var firstItem: SearchHistoryItem
-    
-        public mutating func next() -> SearchHistoryItem? {
-            var item: SearchHistoryItem? = nil
-            if let prev = currentItem.prev {
-                item = currentItem
-                currentItem = prev
+    public func completions(nameStartsWith prefix: String? = nil) -> [SearchBoxCompletion] {
+        var historyItem = last
+        var completionItems = [SearchBoxCompletion]()
+        
+        while historyItem !== first {
+            if prefix == nil || historyItem.name.lowercased().starts(with: prefix!) {
+                completionItems.append(SearchBoxCompletion(name: historyItem.name, detail: historyItem.detail, favorite: historyItem.favorite))
             }
-            return (item === firstItem) ? nil : item
+            historyItem = historyItem.prev!
         }
+        
+        return completionItems
     }
 }
 

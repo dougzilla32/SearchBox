@@ -51,7 +51,7 @@ let kSuggestionDetailedLabel = "detailedLabel"
 let kSuggestionFavorite = "favorite"
 let kSuggestionObserver = "observer"
 
-class SuggestionsWindowController: NSWindowController {
+@MainActor class SuggestionsWindowController: NSWindowController {
     var action: Selector?
     var target: Any?
     private var parentTextField: SearchBox?
@@ -66,7 +66,7 @@ class SuggestionsWindowController: NSWindowController {
     private var favoriteImage = NSImage(named: "Heart")
     private var favoriteOutlineImage = NSImage(named: "Heart outline")
 
-    init() {
+    @MainActor init() {
         let contentRec = NSRect(x: 0, y: 0, width: 20, height: 20)
         let window = SuggestionsWindow(contentRect: contentRec, defer: true)
         super.init(window: window)
@@ -266,7 +266,7 @@ class SuggestionsWindowController: NSWindowController {
         
         init(parentTextField: SearchBox) { self.parentTextField = parentTextField }
         
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        @MainActor override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
             if let e = object as? Dictionary<String, Any> {
                 parentTextField.favoriteUpdated(label: e[kSuggestionLabel] as! String, detailedLabel: e[kSuggestionDetailedLabel] as! String, favorite: e[kSuggestionFavorite] as! Bool)
             }

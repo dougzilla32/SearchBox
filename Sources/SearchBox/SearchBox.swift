@@ -224,9 +224,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         guard text != "", let searchDelegate = self.searchBoxDelegate else {
             var completionItems = [SearchBoxCompletion]()
             if let searchHistory = searchHistory {
-                for hItem in searchHistory {
-                    completionItems.append(SearchBoxCompletion(name: hItem.name, detail: hItem.detail, favorite: hItem.favorite))
-                }
+                completionItems = searchHistory.completions()
             }
             completionsReceived(items: completionItems, control: control, fieldEditor: fieldEditor)
             return
@@ -256,7 +254,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         var alreadyUsed = Set<String>()
         if self.searchHistory != nil {
             let lowercasedStringValue = self.stringValue.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).lowercased()
-            for hItem in self.searchHistory! where hItem.name.lowercased().starts(with: lowercasedStringValue) {
+            for hItem in self.searchHistory!.completions(nameStartsWith: lowercasedStringValue) {
                 suggestions.append([kSuggestionLabel: hItem.name, kSuggestionDetailedLabel: hItem.detail, kSuggestionFavorite: hItem.favorite])
                 alreadyUsed.insert("\(hItem.name)|\(hItem.detail)")
             }
