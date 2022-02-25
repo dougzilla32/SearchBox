@@ -17,11 +17,11 @@ import Foundation
         self.limit = Swift.max(limit, 2)
     }
     
-    var count: Int {
+    public var count: Int {
         return map.count
     }
     
-    func matchingItems(isFavorited: Bool) -> [SearchHistoryItem] {
+    public func matchingItems(isFavorited: Bool) -> [SearchHistoryItem] {
         var arr: [SearchHistoryItem] = []
         for item in searchHistoryList where item.favorite == isFavorited {
             arr.append(item)
@@ -29,7 +29,7 @@ import Foundation
         return arr
     }
     
-    func get(name: String) -> SearchHistoryItem? {
+    public func get(name: String) -> SearchHistoryItem? {
         return map[name]
     }
     
@@ -64,11 +64,11 @@ import Foundation
         searchHistoryList.insert(item)
     }
     
-    func insertOrUpdate(_ item: SearchHistoryItem) {
+    public func insertOrUpdate(_ item: SearchHistoryItem) {
         insertOrUpdate(name: item.name, detail: item.detail, favorite: item.favorite)
     }
     
-    func insert(contentsOf newItems: [SearchHistoryItem]) {
+    public func insert(contentsOf newItems: [SearchHistoryItem]) {
         for item in newItems {
             assert(map[item.name] == nil)
             map[item.name] = item
@@ -76,7 +76,7 @@ import Foundation
         searchHistoryList.insert(contentsOf: newItems)
     }
     
-    func remove(_ item: SearchHistoryItem) {
+    public func remove(_ item: SearchHistoryItem) {
         map.removeValue(forKey: item.name)
         searchHistoryList.remove(item)
     }
