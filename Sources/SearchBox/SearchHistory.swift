@@ -68,6 +68,14 @@ import Foundation
         insertOrUpdate(name: item.name, detail: item.detail, favorite: item.favorite)
     }
     
+    func insert(contentsOf newItems: [SearchHistoryItem]) {
+        for item in newItems {
+            assert(map[item.name] == nil)
+            map[item.name] = item
+        }
+        searchHistoryList.insert(contentsOf: newItems)
+    }
+    
     func remove(_ item: SearchHistoryItem) {
         map.removeValue(forKey: item.name)
         searchHistoryList.remove(item)
@@ -125,7 +133,7 @@ public class SearchHistoryItem: Comparable {
     public let favorite: Bool
     public let timestamp: Date
     
-    init(name: String, detail: String, favorite: Bool) {
+    public init(name: String, detail: String, favorite: Bool) {
         self.name = name
         self.detail = detail
         self.favorite = favorite
