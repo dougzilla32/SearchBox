@@ -33,7 +33,7 @@ import Foundation
         return map[name]
     }
     
-    public func insertOrUpdate(name: String, detail: String, favorite: Bool) {
+    public func insertOrUpdate(name: String, detail: String, favorite: Bool, userData: Any? = nil) {
         var item: SearchHistoryItem! = map[name]
         if item != nil {
             if item.favorite != favorite {
@@ -45,7 +45,7 @@ import Foundation
             }
             
             searchHistoryList.remove(item)
-            item = SearchHistoryItem(name: name, detail: detail, favorite: favorite, timestamp: item.timestamp)
+            item = SearchHistoryItem(name: name, detail: detail, favorite: favorite, userData: item.userData, timestamp: item.timestamp)
         } else {
             if favorite {
                 favoriteCount += 1
@@ -65,7 +65,7 @@ import Foundation
     }
     
     public func insertOrUpdate(_ item: SearchHistoryItem) {
-        insertOrUpdate(name: item.name, detail: item.detail, favorite: item.favorite)
+        insertOrUpdate(name: item.name, detail: item.detail, favorite: item.favorite, userData: item.userData)
     }
     
     public func insert(contentsOf newItems: [SearchHistoryItem]) {
@@ -91,7 +91,7 @@ import Foundation
             }
 
             searchHistoryList.remove(item)
-            item = SearchHistoryItem(name: newName, detail: item.detail, favorite: item.favorite, timestamp: item.timestamp)
+            item = SearchHistoryItem(name: newName, detail: item.detail, favorite: item.favorite, userData: item.userData, timestamp: item.timestamp)
             insertOrUpdate(item)
         }
     }
@@ -131,19 +131,22 @@ public class SearchHistoryItem: Comparable {
     public let name: String
     public let detail: String
     public let favorite: Bool
+    public let userData: Any?
     public let timestamp: Date
     
-    public init(name: String, detail: String, favorite: Bool) {
+    public init(name: String, detail: String, favorite: Bool, userData: Any? = nil) {
         self.name = name
         self.detail = detail
         self.favorite = favorite
-        timestamp = Date()
+        self.userData = userData
+        self.timestamp = Date()
     }
 
-    internal init(name: String, detail: String, favorite: Bool, timestamp: Date) {
+    internal init(name: String, detail: String, favorite: Bool, userData: Any?, timestamp: Date) {
         self.name = name
         self.detail = detail
         self.favorite = favorite
+        self.userData = userData
         self.timestamp = timestamp
     }
 }
