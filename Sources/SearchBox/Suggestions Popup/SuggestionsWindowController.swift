@@ -208,7 +208,6 @@ let kSuggestionObserver = "observer"
         
         clearFavoriteObservers()
         clearUndoLists()
-        parentTextField?.searchHistory?.resort()
     }
 
     /* Update the array of suggestions. The array should consist of NSDictionaries each containing the following keys:
@@ -496,24 +495,24 @@ let kSuggestionObserver = "observer"
     }
 
     @objc func toggleFavorites(sender: NSButton) {
-        if let favorites = undoFavorites {
-            undoFavorites = nil
-            undoFavoriteNames = nil
-            for f in favorites {
-                f.favorite = true
-            }
-        } else {
-            if let favorites = parentTextField?.searchHistory?.matchingItems(isFavorited: true) {
-                undoFavorites = favorites
-                undoFavoriteNames = Set()
-                for f in favorites {
-                    f.favorite = false
-                    undoFavoriteNames?.insert(f.name)
-                }
-            }
-        }
-        parentTextField?.showFavorites = true
-        parentTextField?.updateSuggestions(from: nil)
+//        if let favorites = undoFavorites {
+//            undoFavorites = nil
+//            undoFavoriteNames = nil
+//            for f in favorites {
+//                f.favorite = true
+//            }
+//        } else {
+//            if let favorites = parentTextField?.searchHistory?.matchingItems(isFavorited: true) {
+//                undoFavorites = favorites
+//                undoFavoriteNames = Set()
+//                for f in favorites {
+//                    f.favorite = false
+//                    undoFavoriteNames?.insert(f.name)
+//                }
+//            }
+//        }
+//        parentTextField?.showFavorites = true
+//        parentTextField?.updateSuggestions(from: nil)
     }
     
     @objc func toggleRecentlyVisited() {
@@ -521,7 +520,7 @@ let kSuggestionObserver = "observer"
             undoRecentlyVisited = nil
             undoRecentlyVisitedNames = nil
             for s in recentlyVisited {
-                parentTextField?.searchHistory?.insert(s)
+                parentTextField?.searchHistory?.insertOrUpdate(s)
             }
         } else {
             if let recentlyVisited = parentTextField?.searchHistory?.matchingItems(isFavorited: false) {

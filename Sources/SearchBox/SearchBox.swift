@@ -31,7 +31,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     // it it's search history.  Setting this value clears any existing history.
     public var searchHistoryCount: Int {
         get {
-            return searchHistory?.map.count ?? 0
+            return searchHistory?.count ?? 0
         }
         
         set {
@@ -49,7 +49,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         }
         
         set {
-            let historyItem = searchHistory?.map[newValue]
+            let historyItem = searchHistory?.get(name: newValue)
             searchValue = (name: newValue, detail: historyItem?.detail ?? "", favorite: historyItem?.favorite ?? false)
         }
     }
@@ -64,7 +64,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
             nameValue = newValue.name
             detailValue = newValue.detail
             favoriteValue = newValue.favorite
-            searchHistory?.insert(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
+            searchHistory?.insertOrUpdate(name: newValue.name, detail: newValue.detail, favorite: newValue.favorite)
         }
     }
     
@@ -72,7 +72,7 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
         if nameValue == oldName {
             stringValue = newName
             nameValue = newName
-            if let item = searchHistory?.map[oldName] {
+            if let item = searchHistory?.get(name: oldName) {
                 detailValue = item.detail
                 favoriteValue = item.favorite
             }
@@ -283,13 +283,13 @@ public class SearchBox: NSSearchField, NSSearchFieldDelegate {
     }
     
     func favoriteUpdated(label: String, detailedLabel: String, favorite: Bool) {
-        searchHistory?.insert(name: label, detail: detailedLabel, favorite: favorite)
+        searchHistory?.insertOrUpdate(name: label, detail: detailedLabel, favorite: favorite)
         if nameValue != "" {
             if nameValue == label {
                 detailValue = detailedLabel
                 favoriteValue = favorite
             } else {
-                searchHistory?.insert(name: nameValue, detail: detailValue, favorite: favoriteValue)
+                searchHistory?.insertOrUpdate(name: nameValue, detail: detailValue, favorite: favoriteValue)
             }
         }
         searchBoxDelegate?.favoriteUpdated(name: label, detail: detailedLabel, favorite: favorite)
