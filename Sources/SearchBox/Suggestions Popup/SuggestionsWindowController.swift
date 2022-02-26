@@ -51,7 +51,7 @@ let kSuggestionDetailedLabel = "detailedLabel"
 let kSuggestionFavorite = "favorite"
 let kSuggestionObserver = "observer"
 
-@MainActor class SuggestionsWindowController: NSWindowController {
+class SuggestionsWindowController: NSWindowController {
     var action: Selector?
     var target: Any?
     private var parentTextField: SearchBox?
@@ -66,7 +66,7 @@ let kSuggestionObserver = "observer"
     private var favoriteImage = NSImage(named: "Heart")
     private var favoriteOutlineImage = NSImage(named: "Heart outline")
 
-    @MainActor init() {
+    init() {
         let contentRec = NSRect(x: 0, y: 0, width: 20, height: 20)
         let window = SuggestionsWindow(contentRect: contentRec, defer: true)
         super.init(window: window)
@@ -265,7 +265,7 @@ let kSuggestionObserver = "observer"
         
         init(parentTextField: SearchBox) { self.parentTextField = parentTextField }
         
-        @MainActor override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
             if let e = object as? Dictionary<String, Any> {
                 parentTextField.favoriteUpdated(label: e[kSuggestionLabel] as! String, detailedLabel: e[kSuggestionDetailedLabel] as! String, favorite: e[kSuggestionFavorite] as! Bool)
             }
@@ -495,24 +495,26 @@ let kSuggestionObserver = "observer"
     }
 
     @objc func toggleFavorites(sender: NSButton) {
-//        if let favorites = undoFavorites {
-//            undoFavorites = nil
-//            undoFavoriteNames = nil
-//            for f in favorites {
-//                f.favorite = true
-//            }
-//        } else {
-//            if let favorites = parentTextField?.searchHistory?.matchingItems(isFavorited: true) {
-//                undoFavorites = favorites
-//                undoFavoriteNames = Set()
-//                for f in favorites {
-//                    f.favorite = false
-//                    undoFavoriteNames?.insert(f.name)
-//                }
-//            }
-//        }
-//        parentTextField?.showFavorites = true
-//        parentTextField?.updateSuggestions(from: nil)
+        if let favorites = undoFavorites {
+            undoFavorites = nil
+            undoFavoriteNames = nil
+            for f in favorites {
+                parentTextField?.searchHistory?.insertOrUpdate(
+                    name: f.name, detail: f.detail, favorite: true, userData: f.userData, timestamp: f.timestamp)
+            }
+        } else {
+            if let favorites = parentTextField?.searchHistory?.matchingItems(isFavorited: true) {
+                undoFavorites = favorites
+                undoFavoriteNames = Set()
+                for f in favorites {
+                    parentTextField?.searchHistory?.insertOrUpdate(
+                        name: f.name, detail: f.detail, favorite: false, userData: f.userData, timestamp: f.timestamp)
+                    undoFavoriteNames?.insert(f.name)
+                }
+            }
+        }
+        parentTextField?.showFavorites = true
+        parentTextField?.updateSuggestions(from: nil)
     }
     
     @objc func toggleRecentlyVisited() {
