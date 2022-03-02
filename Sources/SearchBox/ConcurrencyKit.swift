@@ -118,7 +118,7 @@ extension ThrowingTaskGroup {
 ///  Taken from https://www.swiftbysundell.com/articles/making-async-system-apis-backward-compatible/
 @available(macOS, deprecated: 12, message: "Use the built-in API instead")
 extension URLSession {
-    public func data(from url: URL) async throws -> (Data, URLResponse) {
+    public func dataBC(from url: URL) async throws -> (Data, URLResponse) {
         try await withCheckedThrowingContinuation { continuation in
             let task = self.dataTask(with: url) { data, response, error in
                 guard let data = data, let response = response else {
