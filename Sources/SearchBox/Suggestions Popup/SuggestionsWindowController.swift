@@ -514,7 +514,7 @@ class SuggestionsWindowController: NSWindowController {
             }
         }
         parentTextField?.showFavorites = true
-        parentTextField?.updateSuggestions(from: nil)
+        parentTextField?.updateSuggestions(from: parentTextField)
     }
     
     @objc func toggleRecentlyVisited() {
@@ -535,7 +535,7 @@ class SuggestionsWindowController: NSWindowController {
             }
         }
         parentTextField?.showFavorites = true
-        parentTextField?.updateSuggestions(from: nil)
+        parentTextField?.updateSuggestions(from: parentTextField)
     }
     
     /* The mouse is now over one of our child image views. Update selection and send action.
