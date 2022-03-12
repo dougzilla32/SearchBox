@@ -7,20 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9120200927DC6EDD0014AE41 /* SearchBox in Frameworks */ = {isa = PBXBuildFile; productRef = 9120200827DC6EDD0014AE41 /* SearchBox */; };
 		9186C90F27A2696000EDBD7C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9186C90E27A2696000EDBD7C /* AppDelegate.swift */; };
 		9186C91127A2696000EDBD7C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9186C91027A2696000EDBD7C /* ViewController.swift */; };
 		9186C91327A2696100EDBD7C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9186C91227A2696100EDBD7C /* Assets.xcassets */; };
 		9186C91627A2696100EDBD7C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9186C91427A2696100EDBD7C /* Main.storyboard */; };
-		9186C94827A318DE00EDBD7C /* SearchBox in Frameworks */ = {isa = PBXBuildFile; productRef = 9186C94727A318DE00EDBD7C /* SearchBox */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9186C90B27A2696000EDBD7C /* SearchBoxExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SearchBoxExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9120200727DC6EC20014AE41 /* SearchBox */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SearchBox; path = ..; sourceTree = "<group>"; };
+		9186C90B27A2696000EDBD7C /* SearchBoxDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SearchBoxDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9186C90E27A2696000EDBD7C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9186C91027A2696000EDBD7C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		9186C91227A2696100EDBD7C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9186C91527A2696100EDBD7C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		9186C91727A2696100EDBD7C /* SearchBoxExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SearchBoxExample.entitlements; sourceTree = "<group>"; };
+		9186C91727A2696100EDBD7C /* SearchBoxDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SearchBoxDemo.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,17 +29,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9186C94827A318DE00EDBD7C /* SearchBox in Frameworks */,
+				9120200927DC6EDD0014AE41 /* SearchBox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9120200627DC6EC20014AE41 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				9120200727DC6EC20014AE41 /* SearchBox */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		9186C90227A2696000EDBD7C = {
 			isa = PBXGroup;
 			children = (
-				9186C90D27A2696000EDBD7C /* SearchBoxExample */,
+				9120200627DC6EC20014AE41 /* Packages */,
+				9186C90D27A2696000EDBD7C /* SearchBoxDemo */,
 				9186C90C27A2696000EDBD7C /* Products */,
 				9186C91D27A26B4A00EDBD7C /* Frameworks */,
 			);
@@ -47,21 +57,21 @@
 		9186C90C27A2696000EDBD7C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9186C90B27A2696000EDBD7C /* SearchBoxExample.app */,
+				9186C90B27A2696000EDBD7C /* SearchBoxDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9186C90D27A2696000EDBD7C /* SearchBoxExample */ = {
+		9186C90D27A2696000EDBD7C /* SearchBoxDemo */ = {
 			isa = PBXGroup;
 			children = (
 				9186C90E27A2696000EDBD7C /* AppDelegate.swift */,
 				9186C91027A2696000EDBD7C /* ViewController.swift */,
 				9186C91227A2696100EDBD7C /* Assets.xcassets */,
 				9186C91427A2696100EDBD7C /* Main.storyboard */,
-				9186C91727A2696100EDBD7C /* SearchBoxExample.entitlements */,
+				9186C91727A2696100EDBD7C /* SearchBoxDemo.entitlements */,
 			);
-			path = SearchBoxExample;
+			path = SearchBoxDemo;
 			sourceTree = "<group>";
 		};
 		9186C91D27A26B4A00EDBD7C /* Frameworks */ = {
@@ -74,9 +84,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9186C90A27A2696000EDBD7C /* SearchBoxExample */ = {
+		9186C90A27A2696000EDBD7C /* SearchBoxDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9186C91A27A2696100EDBD7C /* Build configuration list for PBXNativeTarget "SearchBoxExample" */;
+			buildConfigurationList = 9186C91A27A2696100EDBD7C /* Build configuration list for PBXNativeTarget "SearchBoxDemo" */;
 			buildPhases = (
 				9186C90727A2696000EDBD7C /* Sources */,
 				9186C90827A2696000EDBD7C /* Frameworks */,
@@ -86,12 +96,12 @@
 			);
 			dependencies = (
 			);
-			name = SearchBoxExample;
+			name = SearchBoxDemo;
 			packageProductDependencies = (
-				9186C94727A318DE00EDBD7C /* SearchBox */,
+				9120200827DC6EDD0014AE41 /* SearchBox */,
 			);
-			productName = SearchBoxExample;
-			productReference = 9186C90B27A2696000EDBD7C /* SearchBoxExample.app */;
+			productName = SearchBoxDemo;
+			productReference = 9186C90B27A2696000EDBD7C /* SearchBoxDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -109,7 +119,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9186C90627A2696000EDBD7C /* Build configuration list for PBXProject "SearchBoxExample" */;
+			buildConfigurationList = 9186C90627A2696000EDBD7C /* Build configuration list for PBXProject "SearchBoxDemo" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -119,13 +129,12 @@
 			);
 			mainGroup = 9186C90227A2696000EDBD7C;
 			packageReferences = (
-				9186C94627A318DE00EDBD7C /* XCRemoteSwiftPackageReference "SearchBox" */,
 			);
 			productRefGroup = 9186C90C27A2696000EDBD7C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9186C90A27A2696000EDBD7C /* SearchBoxExample */,
+				9186C90A27A2696000EDBD7C /* SearchBoxDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -286,7 +295,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SearchBoxExample/SearchBoxExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SearchBoxDemo/SearchBoxDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -301,7 +310,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = doug.SearchBoxExample;
+				PRODUCT_BUNDLE_IDENTIFIER = doug.SearchBoxDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -313,7 +322,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SearchBoxExample/SearchBoxExample.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SearchBoxDemo/SearchBoxDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -328,7 +337,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = doug.SearchBoxExample;
+				PRODUCT_BUNDLE_IDENTIFIER = doug.SearchBoxDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -338,7 +347,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9186C90627A2696000EDBD7C /* Build configuration list for PBXProject "SearchBoxExample" */ = {
+		9186C90627A2696000EDBD7C /* Build configuration list for PBXProject "SearchBoxDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9186C91827A2696100EDBD7C /* Debug */,
@@ -347,7 +356,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9186C91A27A2696100EDBD7C /* Build configuration list for PBXNativeTarget "SearchBoxExample" */ = {
+		9186C91A27A2696100EDBD7C /* Build configuration list for PBXNativeTarget "SearchBoxDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9186C91B27A2696100EDBD7C /* Debug */,
@@ -358,21 +367,9 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		9186C94627A318DE00EDBD7C /* XCRemoteSwiftPackageReference "SearchBox" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/dougzilla32/SearchBox";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		9186C94727A318DE00EDBD7C /* SearchBox */ = {
+		9120200827DC6EDD0014AE41 /* SearchBox */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9186C94627A318DE00EDBD7C /* XCRemoteSwiftPackageReference "SearchBox" */;
 			productName = SearchBox;
 		};
 /* End XCSwiftPackageProductDependency section */

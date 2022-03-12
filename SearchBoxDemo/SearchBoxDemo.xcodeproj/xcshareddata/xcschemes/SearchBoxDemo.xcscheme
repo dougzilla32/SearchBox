@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9186C90A27A2696000EDBD7C"
-               BuildableName = "SearchBoxExample.app"
-               BlueprintName = "SearchBoxExample"
-               ReferencedContainer = "container:SearchBoxExample.xcodeproj">
+               BuildableName = "SearchBoxDemo.app"
+               BlueprintName = "SearchBoxDemo"
+               ReferencedContainer = "container:SearchBoxDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9186C90A27A2696000EDBD7C"
-            BuildableName = "SearchBoxExample.app"
-            BlueprintName = "SearchBoxExample"
-            ReferencedContainer = "container:SearchBoxExample.xcodeproj">
+            BuildableName = "SearchBoxDemo.app"
+            BlueprintName = "SearchBoxDemo"
+            ReferencedContainer = "container:SearchBoxDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "9186C90A27A2696000EDBD7C"
-            BuildableName = "SearchBoxExample.app"
-            BlueprintName = "SearchBoxExample"
-            ReferencedContainer = "container:SearchBoxExample.xcodeproj">
+            BuildableName = "SearchBoxDemo.app"
+            BlueprintName = "SearchBoxDemo"
+            ReferencedContainer = "container:SearchBoxDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
